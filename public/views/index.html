@@ -1,0 +1,67 @@
+<!--<p>THIS IS INDEX.HTML</p>
+<script src="/socket.io/socket.io.js"></script>
+<script>
+    var socket = io();   
+    socket.emit('test', "TEST VALUE");  
+    socket.on('test', function(msg){
+        console.log("Client received: " + msg);
+    });
+</script> -->
+
+<!doctype html>
+<html>
+  <head>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+    <script>
+        $(function () {
+            var socket = io();
+            $('#form1').submit(function(){
+                socket.emit('test', $('#m').val());
+                $('#m').val('');
+                return false;
+            });
+            socket.on('news', function(msg){
+                console.log(msg);
+                $('#messages').append($('<li>').text(msg.hello));
+            });
+
+
+            $('#form2').submit(function(){
+                socket.emit('ng');
+                return false;
+            });
+            socket.on('ngConf', function(msg){
+                console.log(msg.hello);
+            });
+
+            $('#form3').submit(function(){
+                socket.emit('jg', $('#jg').val());
+                return false;
+            });
+            socket.on('jgConf', function(msg){
+                console.log(msg);
+            });
+
+        });
+    </script>
+  </head>
+
+  <body>
+    <ul id="messages"></ul>
+    <form id="form1" action="">
+      <input id="m"/><button>Send</button>
+    </form>
+    <br\>
+    <form id="form2" action="">
+        <p>Enter Name</p>
+        <input id="ng"/><button>New Game</button>
+    </form>
+    <form id="form3" action="">
+        <p>Enter num</p>
+        <input id="jg"/><button>Join Game</button>
+    </form>
+  </body>
+
+</html>

@@ -1,0 +1,26 @@
+{
+  "name": "phantasm",
+  "version": "1.0.0",
+  "description": "Spin off of the game Mafia/Town of Salem using the theme of ghosts.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aarb1/NoblePhantasm.git"
+  },
+  "author": "aayush & arjun",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/aarb1/NoblePhantasm/issues"
+  },
+  "homepage": "https://github.com/aarb1/NoblePhantasm#readme",
+  "dependencies": {
+    "express": "^4.16.2",
+    "hashmap": "^2.3.0",
+    "http": "0.0.0",
+    "socket.io": "^2.0.4"
+  }
+}
