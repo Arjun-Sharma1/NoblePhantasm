@@ -10,47 +10,67 @@ var sessionId = 0;
 var lobbyReg = new HashMap();
 
 require('./app/routes')(app);
+var helpers = require('./app/helpers');
 
 io.on('connection', function(socket){
-    console.log('user connected');
+    console.log('User ' + socket.id +  ' has connected');
     
     socket.on('disconnect', function(){
         console.log('user disconnected');
     });
 
-    socket.on('test', function(msg){
-        console.log("server received: " + msg);
-        socket.emit('news', { hello: msg });
-    });
+    // socket.on('test', function(msg){
+    //     console.log("server received: " + msg);
+    //     socket.emit('news', { hello: msg });
+    // });
 
-    socket.on('ng', function(msg){
-        console.log("server ng request received");
+    socket.on('newGame', function(name){
+        //helpers.helper1();
+        console.log("Server has recieved a new game request");
+        
         sessionId++;
-        lobbyReg.set(sessionId, [socket.id]); //NEED TO STORE A HASHMAP IN LOBBYREG WITH SOCKETID,NAME
+        var clientMap = new HashMap();
+        clientMap.set(socket.id, name);
+        lobbyReg.set(sessionId, clientMap);
         socket.emit('ngConf', { hello: "New game created for user: " + socket.id + " AND Session id is: " + sessionId});
     });
 
-    socket.on('jg', function(msg){
-        console.log("server jg request received: " + msg);
-        var reqJoinId = parseInt(msg);
+    socket.on('joinGame', function(gameId, name){
+        
+        console.log("Server has recieved a joinGame request for " + gameId + " from " + name);
+        
+        var reqJoinId = parseInt(gameId);
+        
         if (lobbyReg.has(reqJoinId)){
-            var clientList = lobbyReg.get(reqJoinId);
-            clientList.push(socket.id);
-            lobbyReg.set(reqJoinId, clientList)
-            console.log(lobbyReg.get(reqJoinId));
             
-            clientList.forEach(function(element) {
-                io.to(element).emit('jgConf', 'connected client: ' + clientList);
-            });
+            var clientMap = lobbyReg.get(reqJoinId);
             
+            if (!clientMap.has(socket.id)){
+                clientMap.set(socket.id, name);
+                lobbyReg.set(reqJoinId, clientList);                
+            } else {
+                console.log('Client is already in the lobby')
+            }
+            // clientList.forEach(function(element) {
+            //     io.to(element).emit('jgConf', 'connected client: ' + clientList);
+            // })            
             //socket.emit('jgConf', { hello: "Game joined for: " + socket.id + " AND Session id is: " + sessionId});
         } else {
-            console.log("no lobby dawg")
-            socket.emit('jgConf', { hello: "Cant join"});
+            console.log("Lobby " + gameId + " doesn't exist")
         }
         
     });
 
+    socket.on('startGame', function(gameId){
+        console.log("Start game request recieved for " + gameId + ", delegating roles...");
+
+        var clientMap = new HashMap(lobbyReg.get(gameId));
+        var delegatedRoles = helpers.assignAdmin(socket.id);
+        clientMap.remove(socket.id); //removing this client from hashmap as their role has been assigned as admin
+        var delegatedRoles = helpers.delegate(clientMap);
+        
+
+    });
 });
 
 server.listen(3000, function(){
