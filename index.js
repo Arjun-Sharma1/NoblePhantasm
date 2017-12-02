@@ -69,7 +69,13 @@ io.on('connection', function(socket){
         clientMap.remove(socket.id); //removing this client from hashmap as their role has been assigned as admin
         var delegatedRoles = helpers.delegate(clientMap);
         
-
+        lobbyReg.get(gameId).forEach(function(value, key) {
+            io.to(element).emit('startGameConf', delegatedRoles);
+        });
+        
+        clientList.forEach(function(element) {
+            
+        })    
     });
 });
 
