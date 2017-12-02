@@ -2,10 +2,16 @@
   "name": "phantasm",
   "version": "1.0.0",
   "description": "Spin off of the game Mafia/Town of Salem using the theme of ghosts.",
-  "main": "index.js",
-  "scripts": {
-    "start": "node index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+  "private": true,
+  "dependencies": {
+    "express": "^4.16.2",
+    "hashmap": "^2.3.0",
+    "http": "0.0.0",
+    "react": "^16.2.0",
+    "react-dom": "^16.2.0",
+    "react-scripts": "1.0.17",
+    "socket.io": "^2.0.4",
+    "socket.io-client": "^2.0.4"
   },
   "repository": {
     "type": "git",
@@ -17,10 +23,10 @@
     "url": "https://github.com/aarb1/NoblePhantasm/issues"
   },
   "homepage": "https://github.com/aarb1/NoblePhantasm#readme",
-  "dependencies": {
-    "express": "^4.16.2",
-    "hashmap": "^2.3.0",
-    "http": "0.0.0",
-    "socket.io": "^2.0.4"
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test --env=jsdom",
+    "eject": "react-scripts eject"
   }
 }
