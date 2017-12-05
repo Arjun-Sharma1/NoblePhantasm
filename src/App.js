@@ -20,9 +20,9 @@ class App extends Component {
   handleSubmit(event) {
     var dataToSend = '';
     if(this.state.name !== ''){
-      newGame("newGame",this.state.name);
+      this.props.history.push('/newGame');
     }else if(this.state.gameCode !== ''){
-      newGame("joinGame", this.state.gameCode);
+      this.props.history.push('/joinGame');
     }else if(this.state.message !== ''){
       newGame("test",this.state.message);
     }else{
