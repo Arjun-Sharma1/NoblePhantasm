@@ -19,7 +19,7 @@ io.on('connection', function(socket){
         var clientMap = new HashMap();
         clientMap.set(socket.id, name);
         lobbyReg.set(lobbyId, clientMap);
-        socket.emit('ngConf', { hello: "New game created for user: " + socket.id + " AND Lobby id is: " + lobbyId});
+        socket.emit('ngConf', { lobby: lobbyId});
     });
 
     socket.on('joinGame', function(lobbyId, name){
@@ -33,6 +33,7 @@ io.on('connection', function(socket){
             if (!clientMap.has(socket.id)){
                 clientMap.set(socket.id, name);
                 lobbyReg.set(lobbyId, clientMap);
+                socket.emit('jgConf', { lobby: lobbyId})
             } else {
                 console.log('Client is already in the lobby')
             }

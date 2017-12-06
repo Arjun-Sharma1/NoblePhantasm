@@ -7,17 +7,26 @@ function newGame(eventType, playerName) {
 
 function joinGame(eventType, eventData, playerName) {
     socket.emit(eventType, eventData, playerName);
-  }
+}
+
+function startGame(lobbyId) {
+    socket.emit('startGame');
+}
+
+//Just a temp var for testing purpose, will re-design the frontend organization
+var lobbyId;
 
 function recievedMessages(){
   socket.on('news',function(msg){
       console.log(msg);
   });
   socket.on('ngConf',function(msg){
-      console.log(msg);
+    lobbyId = msg.lobby;  
+    console.log(msg.lobby);
   });
   socket.on('jgConf',function(msg){
-      console.log(msg);
+    lobbyId = msg.lobby;
+    console.log(msg.lobby);
   });
 }
 

@@ -4,7 +4,7 @@ import { newGame, recievedMessages } from './api';
 //import './App.css';
 
 class App extends Component {
-  constructor(props){
+  constructor(props) {
     super(props);
     this.state = {name: '', gameCode: '', message: ''};
 
@@ -13,11 +13,11 @@ class App extends Component {
     recievedMessages();
   }
 
-  handleChange(event){
+  handleChange(event) {
     this.setState({[event.target.name]: event.target.value});
   }
 
-  handleSubmit(event){
+  handleSubmit(event) {
     var dataToSend = '';
     if(this.state.name !== ''){
       newGame("newGame",this.state.name);
@@ -30,7 +30,7 @@ class App extends Component {
     event.preventDefault();
   }
 
-  createGame(event){
+  createGame(event) {
     if(this.state.name !== ''){
       console.log(this.state.name);
       //newGame("newGame",this.state.name);
@@ -38,9 +38,17 @@ class App extends Component {
     event.preventDefault();
   }
 
-  joinGame(event){
+  joinGame(event) {
     if(this.state.gameCode !== ''){
       newGame("joinGame", this.state.gameCode);
+    }
+    event.preventDefault();
+  }
+
+  startGame(event) {
+    if(this.state.name !== ''){
+      console.log(this.state.name);
+      //newGame("newGame",this.state.name);
     }
     event.preventDefault();
   }
@@ -64,6 +72,10 @@ class App extends Component {
         <form id="form3" onSubmit={this.handleSubmit} onChange={this.handleChange}>
             <p>Enter num</p>
             <input id="jg" name='gameCode' value={this.state.gameCode}/><button>Join Game</button>
+        </form>
+        <form id="form4" onSubmit={this.startGame} onChange={this.handleChange}>
+            <p>Enter start</p>
+            <input id="xyz" name='xyz1'/><button>Start Game</button>
         </form>
 
         {/* <input id="nameInput" 
