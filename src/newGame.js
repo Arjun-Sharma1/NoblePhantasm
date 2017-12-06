@@ -1,6 +1,6 @@
 import { Switch, Route } from 'react-router-dom'
 import React, { Component } from 'react';
-import { newGame, recievedMessages } from './api';
+import { newGame, recievedMessages, socket } from './api';
 import {joinGameID} from './joinGame.js';
 
 
@@ -21,7 +21,13 @@ export class newGameCreate extends Component {
   handleSubmit(event) {
     if(this.state.gameCode !== ''){
       newGame("newGame", this.state.gameCode);
-      this.props.history.push('/joinGame/'+this.state.gameCode);
+      let path = this.props.history;
+      socket.on('ngConf',function(msg){
+          if(msg.sessionId !== ''){
+              path.push('/joinGame/'+msg.sessionId);
+          }
+          return false;
+      });
       // if(test){
       //   this.props.history.push('/joinGame/'+this.state.gameCode);
       // }else{

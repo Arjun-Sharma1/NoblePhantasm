@@ -1,6 +1,6 @@
 import { Switch, Route } from 'react-router-dom'
 import React, { Component } from 'react';
-import { newGame, recievedMessages } from './api';
+import { newGame, recievedMessages, socket } from './api';
 
 
 export class joinGame extends Component {
@@ -20,7 +20,14 @@ export class joinGame extends Component {
   handleSubmit(event) {
     if(this.state.gameCode !== ''){
       newGame("joinGame", this.state.gameCode);
-      this.props.history.push('/joinGame/'+this.state.gameCode);
+      let path = this.props.history;
+      let gameCode = this.state.gameCode;
+      socket.on('ngConf',function(msg){
+          if(msg.sessionId !== ''){
+              path.push('/joinGame/'+msg.sessionId);
+          }
+          return false;
+      });
       // if(newGame("joinGame", this.state.gameCode)){
       //   this.props.history.push('/joinGame/'+this.state.gameCode);
       // }else{
@@ -55,14 +62,29 @@ export class joinGame extends Component {
 export class joinGameID extends Component {
   constructor(props) {
     super(props);
-    this.state = {gameCode: props.match.params};
+    this.state = {gameCode: props.match.params, users: []};
     recievedMessages();
   }
+
+
   render() {
+    let holder = this.state.users;
+    socket.on('userJoined',function(msg){
+        console.log(msg);
+        if(msg.userId !== ''){
+            holder.push(msg.userId);
+        }
+    });
+    console.log(this.state.users);
     return (
       <div className="App">
         <header className="App-header">
           <h1 className="App-title">Connected to Gameroom: {this.state.gameCode.number}</h1>
+            <ul>
+              {this.state.users.map(function(listValue){
+                return <li>{listValue}</li>;
+              })}
+            </ul>
         </header>
       </div>
     );

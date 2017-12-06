@@ -37,7 +37,7 @@ class App extends Component {
     return (
       <div className="App">
         <header className="App-header">
-          <h1 className="App-title">Welcome to React</h1>
+          <h1 className="App-title">Welcome to Noble Phantasm</h1>
         </header>
         <ul id="messages"></ul>
         <form id="form1" onSubmit={this.handleSubmit} onChange={this.handleChange}>

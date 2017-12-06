@@ -37,6 +37,7 @@ io.on('connection', function(socket){
                 clientMap.set(socket.id, name);
                 lobbyReg.set(reqJoinId, clientMap);
                 socket.emit('ngConf', {sessionId: reqJoinId});
+                io.local.emit('userJoined', {userId: name});
             } else {
                 console.log('Client is already in the lobby')
             }

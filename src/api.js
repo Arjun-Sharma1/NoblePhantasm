@@ -1,9 +1,9 @@
 import openSocket from 'socket.io-client';
-const  socket = openSocket('http://localhost:8000');
+var socket = openSocket('http://localhost:8000');
 
 function newGame(eventType, eventData) {
   socket.emit(eventType, eventData, "asdasd");
-  socket.on('ngConf',function(msg, fn){
+  socket.on('ngConf',function(msg){
       console.log(msg);
       if(msg.sessionId !== ''){
           return true;
@@ -21,4 +21,4 @@ function recievedMessages(){
   });
 }
 
-export { newGame, recievedMessages};
+export { newGame, recievedMessages, socket};
