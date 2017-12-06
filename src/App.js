@@ -4,7 +4,7 @@ import { newGame, recievedMessages } from './api';
 //import './App.css';
 
 class App extends Component {
-  constructor(props) {
+  constructor(props){
     super(props);
     this.state = {name: '', gameCode: '', message: ''};
 
@@ -13,22 +13,35 @@ class App extends Component {
     recievedMessages();
   }
 
-  handleChange(event) {
+  handleChange(event){
     this.setState({[event.target.name]: event.target.value});
   }
 
-  handleSubmit(event) {
+  handleSubmit(event){
     var dataToSend = '';
     if(this.state.name !== ''){
       newGame("newGame",this.state.name);
     }else if(this.state.gameCode !== ''){
       newGame("joinGame", this.state.gameCode);
-    }else if(this.state.message !== ''){
-      newGame("test",this.state.message);
     }else{
-      console.log("error");
+      console.log('error');
     }
     //Stop from refreshing the page
+    event.preventDefault();
+  }
+
+  createGame(event){
+    if(this.state.name !== ''){
+      console.log(this.state.name);
+      //newGame("newGame",this.state.name);
+    }
+    event.preventDefault();
+  }
+
+  joinGame(event){
+    if(this.state.gameCode !== ''){
+      newGame("joinGame", this.state.gameCode);
+    }
     event.preventDefault();
   }
 
@@ -37,7 +50,7 @@ class App extends Component {
     return (
       <div className="App">
         <header className="App-header">
-          <h1 className="App-title">Welcome to React</h1>
+          <h1 className="App-title">Noble Phantasm</h1>
         </header>
         <ul id="messages"></ul>
         <form id="form1" onSubmit={this.handleSubmit} onChange={this.handleChange}>
@@ -47,10 +60,28 @@ class App extends Component {
             <p>Enter Name</p>
             <input id="ng" name='name' value={this.state.name}/><button>New Game</button>
         </form>
+        <br/>
         <form id="form3" onSubmit={this.handleSubmit} onChange={this.handleChange}>
             <p>Enter num</p>
             <input id="jg" name='gameCode' value={this.state.gameCode}/><button>Join Game</button>
         </form>
+
+        {/* <input id="nameInput" 
+        placeholder="Name" name='name' 
+        value={this.state.name} 
+        onChangeText={(name) => this.setState({name})}
+        onChange={this.handleChange}/>
+        <br/>
+        <input id="gameInput" 
+        placeholder="Game Code" 
+        name='gameCode'
+        value={this.state.gameCode} 
+        onChange={onChange={event => this.updateInputValue(evt)}}/>
+        <br/>
+        <button id='ngBtn' name='ngBtn' onClick={this.createGame}>New Game</button>
+        <br/>
+        <button id='jgBtn' name='jgBtn' onClick={this.joinGame}>Join Game</button> */}
+
       </div>
     );
   }

@@ -1,9 +1,13 @@
 import openSocket from 'socket.io-client';
 const  socket = openSocket('http://localhost:8000');
 
-function newGame(eventType, eventData) {
-  socket.emit(eventType, eventData, "asdasd");
+function newGame(eventType, playerName) {
+  socket.emit(eventType, playerName);
 }
+
+function joinGame(eventType, eventData, playerName) {
+    socket.emit(eventType, eventData, playerName);
+  }
 
 function recievedMessages(){
   socket.on('news',function(msg){

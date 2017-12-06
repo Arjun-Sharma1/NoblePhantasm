@@ -1,7 +1,6 @@
 var HashMap = require('hashmap');
 const io = require('socket.io')();
 
-var sessionId = 0;
 var lobbyReg = new HashMap();
 var helpers = require('./src/helpers.js');
 
@@ -15,45 +14,43 @@ io.on('connection', function(socket){
     socket.on('newGame', function(name){
         //helpers.helper1();
         console.log("Server has recieved a new game request");
-
-        sessionId++;
+        var temp = helpers.generateLobbyId(lobbyReg);
+        var lobbyId = helpers.generateLobbyId(lobbyReg);
         var clientMap = new HashMap();
         clientMap.set(socket.id, name);
-        lobbyReg.set(sessionId, clientMap);
-        socket.emit('ngConf', { hello: "New game created for user: " + socket.id + " AND Session id is: " + sessionId});
+        lobbyReg.set(lobbyId, clientMap);
+        socket.emit('ngConf', { hello: "New game created for user: " + socket.id + " AND Lobby id is: " + lobbyId});
     });
 
-    socket.on('joinGame', function(gameId, name){
+    socket.on('joinGame', function(lobbyId, name){
 
-        console.log("Server has recieved a joinGame request for " + gameId + " from " + name);
+        console.log("Server has recieved a joinGame request for " + lobbyId + " from " + name);
 
-        var reqJoinId = parseInt(gameId);
+        if (lobbyReg.has(lobbyId)){
 
-        if (lobbyReg.has(reqJoinId)){
-
-            var clientMap = lobbyReg.get(reqJoinId);
+            var clientMap = lobbyReg.get(lobbyId);
 
             if (!clientMap.has(socket.id)){
                 clientMap.set(socket.id, name);
-                lobbyReg.set(reqJoinId, clientMap);
+                lobbyReg.set(lobbyId, clientMap);
             } else {
                 console.log('Client is already in the lobby')
             }
         } else {
-            console.log("Lobby " + gameId + " doesn't exist")
+            console.log("Lobby " + lobbyId + " doesn't exist")
         }
 
     });
 
-    socket.on('startGame', function(gameId){
-        console.log("Start game request recieved for " + gameId + ", delegating roles...");
+    socket.on('startGame', function(lobbyId){
+        console.log("Start game request recieved for " + lobbyId + ", delegating roles...");
 
-        var clientMap = new HashMap(lobbyReg.get(gameId));
+        var clientMap = new HashMap(lobbyReg.get(lobbyId));
         var delegatedRoles = helpers.assignAdmin(socket.id);
         clientMap.remove(socket.id); //removing this client from hashmap as their role has been assigned as admin
         var delegatedRoles = helpers.delegate(clientMap);
 
-        lobbyReg.get(gameId).forEach(function(value, key) {
+        lobbyReg.get(lobbyId).forEach(function(value, key) {
             io.to(element).emit('startGameConf', delegatedRoles);
         });
 

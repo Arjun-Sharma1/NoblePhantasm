@@ -1,5 +1,5 @@
 module.exports = {
-    delegate: function(clientMap){
+    delegate: function(clientMap) {
         var clientIds = [];
 
         clientMap.forEach(function(value, key) {
@@ -16,15 +16,23 @@ module.exports = {
         var delegatedRoles = new HashMap();
         delegatedRoles.set(clientIds[0], "assassin");
 
-        for (var i = 1; i < clientIds.length; i++){
+        for (var i = 1; i < clientIds.length; i++) {
             delegatedRoles.set(clientIds[i], "townee");
         }
 
         return delegatedRoles;
     },
-    assignAdmin: function(clientId){
+    assignAdmin: function(clientId) {
         var delegatedRoles = new HashMap();
         delegatedRoles.set(clientId, "admin");
         return delegatedRoles;
+    },
+    generateLobbyId: function(lobbyReg) {        
+        var lobbyId;
+        do {
+            lobbyId = Math.random().toString(36).substr(2, 5);
+        }
+        while (lobbyReg.has(lobbyId));
+        return lobbyId;
     }
 };
