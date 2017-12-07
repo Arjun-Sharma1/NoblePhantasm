@@ -1,7 +1,6 @@
-import { Switch, Route } from 'react-router-dom'
 import React, { Component } from 'react';
 import { sendNewGameRequest, recievedMessages, socket } from './api';
-import {joinGameID} from './joinGame.js';
+import {setLocalUser} from './joinGame.js';
 
 
 export class newGameCreate extends Component {
@@ -24,11 +23,11 @@ export class newGameCreate extends Component {
       sendNewGameRequest(this.state.username);
       let path = this.props.history;
       socket.on('ngConf',function(msg){
-          if(msg.sessionId !== ''){
-              path.push('/joinGame/'+msg.sessionId);
+          if(msg.lobbyId !== ''){
+            setLocalUser(this.state.username);
+            path.push('/joinGame/'+msg.lobbyId);
           }
-          return false;
-      });
+      }.bind(this));
     }else{
       console.log("error no username entered");
     }
@@ -55,9 +54,6 @@ export class newGameCreate extends Component {
         <button onClick={this.goToLanding}>
           Back
         </button>
-        <Switch>
-          <Route path='/joinGame/:number' component={joinGameID}/>
-        </Switch>
       </div>
     );
   }

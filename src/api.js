@@ -9,6 +9,10 @@ function sendJoinGameRequest(name, lobbyId){
   socket.emit("joinGame", name, lobbyId);
 }
 
+function sendLeaveLobbyRequest(name, lobbyId){
+  socket.emit("leaveLobby", name, lobbyId);
+}
+
 function recievedMessages(){
   socket.on('news',function(msg){
     console.log(msg);
@@ -18,4 +22,4 @@ function recievedMessages(){
   });
 }
 
-export { sendNewGameRequest, sendJoinGameRequest, recievedMessages, socket};
+export { sendNewGameRequest, sendLeaveLobbyRequest, sendJoinGameRequest, recievedMessages, socket};

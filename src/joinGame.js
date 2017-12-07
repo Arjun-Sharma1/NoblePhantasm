@@ -1,12 +1,13 @@
 import { Switch, Route } from 'react-router-dom'
 import React, { Component } from 'react';
-import { sendJoinGameRequest, recievedMessages, socket } from './api';
+import { sendJoinGameRequest,sendLeaveLobbyRequest, recievedMessages, socket } from './api';
+var localUser = '';
 
 
 export class joinGame extends Component {
   constructor(props) {
     super(props);
-    this.state = {gameCode: '',username: ''};
+    this.state = {lobbyId: '',username: ''};
 
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleChange = this.handleChange.bind(this);
@@ -19,22 +20,24 @@ export class joinGame extends Component {
   }
 
   handleSubmit(event) {
-    if(this.state.gameCode !== '' && this.state.username !== ''){
-      sendJoinGameRequest(this.state.username, this.state.gameCode);
+    if(this.state.lobbyId !== '' && this.state.username !== ''){
+      sendJoinGameRequest(this.state.username, this.state.lobbyId);
       let path = this.props.history;
       socket.on('ngConf',function(msg){
-          if(msg.sessionId !== ''){
-              path.push('/joinGame/'+msg.sessionId);
+          if(msg.lobbyId !== ''){
+              localUser = this.state.username;
+              path.push('/joinGame/'+msg.lobbyId);
           }
-      });
+      }.bind(this));
     }else{
-      console.log("error gameCode empty or username empty");
+      console.log("error lobbyId empty or username empty");
     }
     //Stop from refreshing the page
     event.preventDefault();
   }
 
   goToLanding() {
+    localUser = '';
     this.props.history.push('/');
   }
 
@@ -47,7 +50,7 @@ export class joinGame extends Component {
         <form id="form4" onSubmit={this.handleSubmit} onChange={this.handleChange}>
             <input id="username" name='username' value={this.state.username} placeholder="Enter name"/>
             <br></br>
-            <input id="gameCode" name='gameCode' value={this.state.gameCode} placeholder="Enter Lobby Id"/>
+            <input id="lobbyId" name='lobbyId' value={this.state.lobbyId} placeholder="Enter Lobby Id"/>
             <button>Join Game</button>
         </form>
         <button onClick={this.goToLanding}>
@@ -64,40 +67,62 @@ export class joinGame extends Component {
 export class joinGameID extends Component {
   constructor(props) {
     super(props);
-    this.state = {gameCode: props.match.params, users: []};
+    this.state = {lobbyId: props.match.params, users: []};
+    this.leaveLobby = this.leaveLobby.bind(this);
+    this.addUsers = this.addUsers.bind(this);
   }
 
   addUsers(username){
-    let holder = this.state.users;
+    let holder = [];
     username.map(function(user){
-      if(!holder.includes(user)){
+      if(!holder.includes(user) && holder.user!== ''){
         holder.push(user);
       }
       return true;
     })
-    this.setState({users: holder});
+    //Check if component is fully mounted before setting state
+    if(this.refs.joinGame) {
+      this.setState({users: holder});
+    }
+  }
+
+  leaveLobby() {
+    sendLeaveLobbyRequest(localUser, this.state.lobbyId.number);
+    localUser = '';
+    socket.on('leaveLobby',function(msg){
+        this.props.history.push('/');
+    }.bind(this));
   }
 
   render() {
     socket.on('userJoined',function(msg){
-        if(msg.userId !== '' && !this.state.users.includes(msg.userId)){
-            this.addUsers(msg.userId);
+        if(msg.userId !== undefined && !this.state.users.includes(msg.userId) && localUser !== ''){
+          console.log(msg.userId);
+          this.addUsers(msg.userId);
         }
     }.bind(this));
 
     return (
-      <div className="App">
+      <div ref="joinGame" className="App">
         <header className="App-header">
-          <h1 className="App-title">Connected to Gameroom: {this.state.gameCode.number}</h1>
+          <h1 className="App-title">Waiting for Players...</h1>
+          <h3>Lobby Code: {this.state.lobbyId.number}</h3>
           <h4>Current People in Lobby: </h4>
-          <ul>
-          {this.state.users.map(function(listValue){
-            return <li key={listValue}>{listValue}</li>;
-          })}
-          </ul>
         </header>
+        <ul>
+        {this.state.users.map(function(listValue,index){
+          return <li key={index}>{listValue}</li>;
+        })}
+        </ul>
+        <button>Start Game</button>
+        <button onClick={this.leaveLobby}>Leave Game</button>
       </div>
     );
   }
-
 }
+
+function setLocalUser(username){
+  localUser = username;
+};
+
+export { setLocalUser};

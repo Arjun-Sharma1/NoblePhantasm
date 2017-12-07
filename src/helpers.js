@@ -26,5 +26,13 @@ module.exports = {
         var delegatedRoles = new HashMap();
         delegatedRoles.set(clientId, "admin");
         return delegatedRoles;
-    }
+    },
+    generateLobbyId: function(lobbyReg) {
+        var lobbyId;
+        do {
+            lobbyId = Math.random().toString(36).substr(2, 5);
+        }
+        while (lobbyReg.has(lobbyId));
+        return lobbyId;
+      }
 };

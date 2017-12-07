@@ -1,9 +1,9 @@
-var HashMap = require('hashmap');
 const io = require('socket.io')();
-
-var sessionId = 0;
-var lobbyReg = new HashMap();
+var HashMap = require('hashmap');
 var helpers = require('./src/helpers.js');
+
+var lobbyReg = new HashMap();
+
 
 io.on('connection', function(socket){
     console.log('User ' + socket.id +  ' has connected');
@@ -16,47 +16,67 @@ io.on('connection', function(socket){
         //helpers.helper1();
         console.log("Server has recieved a new game request");
 
-        sessionId++;
+        var lobbyId = helpers.generateLobbyId(lobbyReg);
         var clientMap = new HashMap();
         clientMap.set(socket.id, name);
-        lobbyReg.set(sessionId, clientMap);
-        socket.emit('ngConf', { sessionId: sessionId});
+        lobbyReg.set(lobbyId, clientMap);
+        socket.emit('ngConf', { lobbyId: lobbyId});
         io.local.emit('userJoined', {userId: clientMap.values()});
     });
 
-    socket.on('joinGame', function(name, gameId){
+    socket.on('joinGame', function(name, lobbyId){
 
-        console.log("Server has recieved a joinGame request for " + gameId + " from " + name);
+        console.log("Server has recieved a joinGame request for " + lobbyId + " from " + name);
 
-        var reqJoinId = parseInt(gameId);
+        if (lobbyReg.has(lobbyId)){
 
-        if (lobbyReg.has(reqJoinId)){
-
-            var clientMap = lobbyReg.get(reqJoinId);
+            var clientMap = lobbyReg.get(lobbyId);
 
             if (!clientMap.has(socket.id)){
                 clientMap.set(socket.id, name);
-                lobbyReg.set(reqJoinId, clientMap);
-                socket.emit('ngConf', {sessionId: reqJoinId});
+                lobbyReg.set(lobbyId, clientMap);
+                socket.emit('ngConf', {lobbyId: lobbyId});
                 io.local.emit('userJoined', {userId: clientMap.values()});
             } else {
-                console.log('Client is already in the lobby')
+                console.log('Client is already in the lobby');
             }
         } else {
-            console.log("Lobby " + gameId + " doesn't exist")
+            console.log("Lobby " + lobbyId + " doesn't exist");
         }
 
     });
 
-    socket.on('startGame', function(gameId){
-        console.log("Start game request recieved for " + gameId + ", delegating roles...");
+    socket.on('leaveLobby', function(name,lobbyId){
+        //helpers.helper1();
+        console.log("Server has recieved a new leave request for user: " + name + " in lobby: " + lobbyId);
 
-        var clientMap = new HashMap(lobbyReg.get(gameId));
+        if (lobbyReg.has(lobbyId)){
+
+            var clientMap = lobbyReg.get(lobbyId);
+
+            if (clientMap.has(socket.id)){
+                clientMap.remove(socket.id, name);
+                console.log(clientMap);
+                socket.emit('leaveLobby', {left: 'true'});
+                io.local.emit('userJoined', {userId: clientMap.values()});
+                console.log(name+" has left the lobby successfully");
+            } else {
+                console.log('Client has already left the lobby or clientName does not exist');
+            }
+        } else {
+            console.log("Lobby " + lobbyId + " doesn't exist");
+        }
+    });
+
+    socket.on('startGame', function(lobbyId){
+        console.log("Start game request recieved for " + lobbyId + ", delegating roles...");
+
+        var clientMap = new HashMap(lobbyReg.get(lobbyId));
         var delegatedRoles = helpers.assignAdmin(socket.id);
         clientMap.remove(socket.id); //removing this client from hashmap as their role has been assigned as admin
         var delegatedRoles = helpers.delegate(clientMap);
 
-        lobbyReg.get(gameId).forEach(function(value, key) {
+        lobbyReg.get(lobbyId).forEach(function(value, key) {
             io.to(element).emit('startGameConf', delegatedRoles);
         });
 
