@@ -21,9 +21,10 @@ io.on('connection', function(socket){
         clientMap.set(socket.id, name);
         lobbyReg.set(sessionId, clientMap);
         socket.emit('ngConf', { sessionId: sessionId});
+        io.local.emit('userJoined', {userId: clientMap.values()});
     });
 
-    socket.on('joinGame', function(gameId, name){
+    socket.on('joinGame', function(name, gameId){
 
         console.log("Server has recieved a joinGame request for " + gameId + " from " + name);
 
@@ -37,7 +38,7 @@ io.on('connection', function(socket){
                 clientMap.set(socket.id, name);
                 lobbyReg.set(reqJoinId, clientMap);
                 socket.emit('ngConf', {sessionId: reqJoinId});
-                io.local.emit('userJoined', {userId: name});
+                io.local.emit('userJoined', {userId: clientMap.values()});
             } else {
                 console.log('Client is already in the lobby')
             }

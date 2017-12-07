@@ -1,16 +1,17 @@
 import { Switch, Route } from 'react-router-dom'
 import React, { Component } from 'react';
-import { newGame, recievedMessages, socket } from './api';
+import { sendNewGameRequest, recievedMessages, socket } from './api';
 import {joinGameID} from './joinGame.js';
 
 
 export class newGameCreate extends Component {
   constructor(props) {
     super(props);
-    this.state = {gameCode: ''};
+    this.state = {username: ''};
 
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleChange = this.handleChange.bind(this);
+    this.goToLanding = this.goToLanding.bind(this);
     recievedMessages();
   }
 
@@ -19,8 +20,8 @@ export class newGameCreate extends Component {
   }
 
   handleSubmit(event) {
-    if(this.state.gameCode !== ''){
-      newGame("newGame", this.state.gameCode);
+    if(this.state.username !== ''){
+      sendNewGameRequest(this.state.username);
       let path = this.props.history;
       socket.on('ngConf',function(msg){
           if(msg.sessionId !== ''){
@@ -28,16 +29,15 @@ export class newGameCreate extends Component {
           }
           return false;
       });
-      // if(test){
-      //   this.props.history.push('/joinGame/'+this.state.gameCode);
-      // }else{
-      //   console.log("Error Creating Game " + this.state.gameCode);
-      // }
     }else{
-      console.log("error no gameCode Entered");
+      console.log("error no username entered");
     }
     //Stop from refreshing the page
     event.preventDefault();
+  }
+
+  goToLanding() {
+    this.props.history.push('/');
   }
 
 
@@ -45,12 +45,16 @@ export class newGameCreate extends Component {
     return (
       <div className="App">
         <header className="App-header">
-          <h1 className="App-title">Welcome to React</h1>
+          <h1 className="App-title">Welcome to Noble Phantasm</h1>
         </header>
         <form id="form5" onSubmit={this.handleSubmit} onChange={this.handleChange}>
-            <p>Enter num</p>
-            <input id="jg" name='gameCode' value={this.state.gameCode}/><button>Create Game</button>
+            <p>Enter name:</p>
+            <input id="name" name='username' value={this.state.username} placeholder="Enter name"/>
+            <button>Create Game</button>
         </form>
+        <button onClick={this.goToLanding}>
+          Back
+        </button>
         <Switch>
           <Route path='/joinGame/:number' component={joinGameID}/>
         </Switch>
