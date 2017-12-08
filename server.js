@@ -1,8 +1,9 @@
-var HashMap = require('hashmap');
 const io = require('socket.io')();
+var HashMap = require('hashmap');
+var helpers = require('./src/helpers.js');
 
 var lobbyReg = new HashMap();
-var helpers = require('./src/helpers.js');
+
 
 io.on('connection', function(socket){
     console.log('User ' + socket.id +  ' has connected');
@@ -14,15 +15,15 @@ io.on('connection', function(socket){
     socket.on('newGame', function(name){
         //helpers.helper1();
         console.log("Server has recieved a new game request");
-        var temp = helpers.generateLobbyId(lobbyReg);
         var lobbyId = helpers.generateLobbyId(lobbyReg);
         var clientMap = new HashMap();
         clientMap.set(socket.id, name);
         lobbyReg.set(lobbyId, clientMap);
-        socket.emit('ngConf', { lobby: lobbyId});
+        socket.emit('ngConf', { lobbyId: lobbyId});
+        io.local.emit('userJoined', {userId: clientMap.values()});
     });
 
-    socket.on('joinGame', function(lobbyId, name){
+    socket.on('joinGame', function(name, lobbyId){
 
         console.log("Server has recieved a joinGame request for " + lobbyId + " from " + name);
 
@@ -35,12 +36,34 @@ io.on('connection', function(socket){
                 lobbyReg.set(lobbyId, clientMap);
                 socket.emit('jgConf', { lobby: lobbyId})
             } else {
-                console.log('Client is already in the lobby')
+                console.log('Client is already in the lobby');
             }
         } else {
             console.log("Lobby " + lobbyId + " doesn't exist")
         }
 
+    });
+
+    socket.on('leaveLobby', function(name,lobbyId){
+        //helpers.helper1();
+        console.log("Server has recieved a new leave request for user: " + name + " in lobby: " + lobbyId);
+
+        if (lobbyReg.has(lobbyId)){
+
+            var clientMap = lobbyReg.get(lobbyId);
+
+            if (clientMap.has(socket.id)){
+                clientMap.remove(socket.id, name);
+                console.log(clientMap);
+                socket.emit('leaveLobby', {left: 'true'});
+                io.local.emit('userJoined', {userId: clientMap.values()});
+                console.log(name+" has left the lobby successfully");
+            } else {
+                console.log('Client has already left the lobby or clientName does not exist');
+            }
+        } else {
+            console.log("Lobby " + lobbyId + " doesn't exist");
+        }
     });
 
     socket.on('startGame', function(lobbyId){

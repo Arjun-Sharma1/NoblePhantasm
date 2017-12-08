@@ -1,8 +1,16 @@
 import openSocket from 'socket.io-client';
-const  socket = openSocket('http://localhost:8000');
+var socket = openSocket('http://localhost:8000');
 
-function newGame(eventType, playerName) {
-  socket.emit(eventType, playerName);
+function sendNewGameRequest(name) {
+  socket.emit("newGame", name);
+}
+
+function sendJoinGameRequest(name, lobbyId){
+  socket.emit("joinGame", name, lobbyId);
+}
+
+function sendLeaveLobbyRequest(name, lobbyId){
+  socket.emit("leaveLobby", name, lobbyId);
 }
 
 function joinGame(eventType, eventData, playerName) {
@@ -18,11 +26,7 @@ var lobbyId;
 
 function recievedMessages(){
   socket.on('news',function(msg){
-      console.log(msg);
-  });
-  socket.on('ngConf',function(msg){
-    lobbyId = msg.lobby;  
-    console.log(msg.lobby);
+    console.log(msg);
   });
   socket.on('jgConf',function(msg){
     lobbyId = msg.lobby;
@@ -30,4 +34,4 @@ function recievedMessages(){
   });
 }
 
-export { newGame, recievedMessages};
+export { sendNewGameRequest, sendLeaveLobbyRequest, sendJoinGameRequest, recievedMessages, socket};
