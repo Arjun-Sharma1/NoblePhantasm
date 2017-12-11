@@ -1,7 +1,5 @@
 import React, { Component } from 'react';
 import {recievedMessages } from './api';
-//import logo from './logo.svg';
-//import './App.css';
 
 class App extends Component {
   constructor(props) {
@@ -21,31 +19,6 @@ class App extends Component {
   goToJoinGame() {
     this.props.history.push('/joinGame');
   }
-
-  createGame(event) {
-    if(this.state.name !== ''){
-      console.log(this.state.name);
-      //newGame("newGame",this.state.name);
-    }
-    event.preventDefault();
-  }
-
-  joinGame(event) {
-    if(this.state.gameCode !== ''){
-      newGame("joinGame", this.state.gameCode);
-    }
-    event.preventDefault();
-  }
-
-  startGame(event) {
-    if(this.state.name !== ''){
-      console.log(this.state.name);
-      //newGame("newGame",this.state.name);
-    }
-    event.preventDefault();
-  }
-
-
 
   render() {
     return (

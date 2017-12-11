@@ -87,12 +87,16 @@ export class joinGameID extends Component {
   }
 
   leaveLobby() {
-    sendLeaveLobbyRequest(localUser, this.state.lobbyId.number);
+    sendLeaveLobbyRequest(this.state.lobbyId.number);
     localUser = '';
     socket.on('leaveLobby',function(msg){
         this.props.history.push('/');
     }.bind(this));
   }
+
+  // startGame() {
+  //   sendStartGameRequest(localUser, this.state.lobbyId.number);
+  // }
 
   render() {
     socket.on('userJoined',function(msg){
@@ -114,7 +118,7 @@ export class joinGameID extends Component {
           return <li key={index}>{listValue}</li>;
         })}
         </ul>
-        <button>Start Game</button>
+        {/* <button onClick={this.startGame}>Start Game</button> */}
         <button onClick={this.leaveLobby}>Leave Game</button>
       </div>
     );

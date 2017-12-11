@@ -9,28 +9,20 @@ function sendJoinGameRequest(name, lobbyId){
   socket.emit("joinGame", name, lobbyId);
 }
 
-function sendLeaveLobbyRequest(name, lobbyId){
-  socket.emit("leaveLobby", name, lobbyId);
+function sendLeaveLobbyRequest(lobbyId){
+  socket.emit("leaveLobby", lobbyId);
 }
 
-function joinGame(eventType, eventData, playerName) {
-    socket.emit(eventType, eventData, playerName);
+function sendStartGameRequest(lobbyId){
+  socket.emit("startGame", lobbyId);
 }
-
-function startGame(lobbyId) {
-    socket.emit('startGame');
-}
-
-//Just a temp var for testing purpose, will re-design the frontend organization
-var lobbyId;
 
 function recievedMessages(){
   socket.on('news',function(msg){
     console.log(msg);
   });
   socket.on('jgConf',function(msg){
-    lobbyId = msg.lobby;
-    console.log(msg.lobby);
+    console.log(msg);
   });
 }
 

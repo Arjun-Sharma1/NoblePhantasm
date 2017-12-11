@@ -1,12 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-//import './index.css';
 import { BrowserRouter, Switch, Route } from 'react-router-dom'
 import App from './App';
 import {joinGame, joinGameID} from './joinGame.js';
 import {newGameCreate} from './newGame.js';
-
-
 
 ReactDOM.render((
   <BrowserRouter>

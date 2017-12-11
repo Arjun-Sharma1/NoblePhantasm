@@ -1,4 +1,5 @@
 module.exports = {
+
     delegate: function(clientMap) {
         var clientIds = [];
 
@@ -22,11 +23,13 @@ module.exports = {
 
         return delegatedRoles;
     },
+
     assignAdmin: function(clientId) {
         var delegatedRoles = new HashMap();
         delegatedRoles.set(clientId, "admin");
         return delegatedRoles;
     },
+    
     generateLobbyId: function(lobbyReg) {        
         var lobbyId;
         do {

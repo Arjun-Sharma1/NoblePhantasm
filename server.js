@@ -24,7 +24,7 @@ io.on('connection', function(socket){
     });
 
     socket.on('joinGame', function(name, lobbyId){
-
+        
         console.log("Server has recieved a joinGame request for " + lobbyId + " from " + name);
 
         if (lobbyReg.has(lobbyId)){
@@ -34,30 +34,32 @@ io.on('connection', function(socket){
             if (!clientMap.has(socket.id)){
                 clientMap.set(socket.id, name);
                 lobbyReg.set(lobbyId, clientMap);
-                socket.emit('jgConf', { lobby: lobbyId})
+                socket.emit('ngConf', {lobbyId: lobbyId});
+                io.local.emit('userJoined', {userId: clientMap.values()});
             } else {
                 console.log('Client is already in the lobby');
             }
         } else {
-            console.log("Lobby " + lobbyId + " doesn't exist")
+            console.log("Lobby " + lobbyId + " doesn't exist");
         }
-
+        
     });
 
-    socket.on('leaveLobby', function(name,lobbyId){
-        //helpers.helper1();
-        console.log("Server has recieved a new leave request for user: " + name + " in lobby: " + lobbyId);
-
+    socket.on('leaveLobby', function(lobbyId){
+                
         if (lobbyReg.has(lobbyId)){
 
             var clientMap = lobbyReg.get(lobbyId);
+            var clientName = clientMap.get(socket.id);            
+            
+            console.log("Server has recieved a new leave request for user: " + clientName + " in lobby: " + lobbyId);
 
             if (clientMap.has(socket.id)){
-                clientMap.remove(socket.id, name);
+                clientMap.remove(socket.id);
                 console.log(clientMap);
                 socket.emit('leaveLobby', {left: 'true'});
                 io.local.emit('userJoined', {userId: clientMap.values()});
-                console.log(name+" has left the lobby successfully");
+                console.log(clientName + " has left the lobby successfully");
             } else {
                 console.log('Client has already left the lobby or clientName does not exist');
             }
