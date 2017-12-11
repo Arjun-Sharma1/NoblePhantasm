@@ -1,6 +1,8 @@
+var HashMap = require('hashmap');
+
 module.exports = {
 
-    delegate: function(clientMap) {
+    delegate: function(clientMap, delegatedRoles) {
         var clientIds = [];
 
         clientMap.forEach(function(value, key) {
@@ -14,19 +16,19 @@ module.exports = {
             clientIds[j] = temp;
         }
 
-        var delegatedRoles = new HashMap();
-        delegatedRoles.set(clientIds[0], "assassin");
+        delegatedRoles.set(clientMap.get(clientIds[0]), "assassin");
 
         for (var i = 1; i < clientIds.length; i++) {
-            delegatedRoles.set(clientIds[i], "townee");
+            delegatedRoles.set(clientMap.get(clientIds[i]), "townee");
         }
 
         return delegatedRoles;
     },
 
-    assignAdmin: function(clientId) {
+    assignAdmin: function(clientMap, socket) {
         var delegatedRoles = new HashMap();
-        delegatedRoles.set(clientId, "admin");
+        delegatedRoles.set(clientMap.get(socket), "admin");
+        clientMap.remove(socket); //removing this client from hashmap as their role has been assigned as admin
         return delegatedRoles;
     },
     
@@ -38,4 +40,5 @@ module.exports = {
         while (lobbyReg.has(lobbyId));
         return lobbyId;
     }
+
 };

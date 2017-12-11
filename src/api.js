@@ -26,4 +26,4 @@ function recievedMessages(){
   });
 }
 
-export { sendNewGameRequest, sendLeaveLobbyRequest, sendJoinGameRequest, recievedMessages, socket};
+export { sendNewGameRequest, sendLeaveLobbyRequest, sendJoinGameRequest, recievedMessages, sendStartGameRequest, socket};

@@ -1,6 +1,6 @@
 import { Switch, Route } from 'react-router-dom'
 import React, { Component } from 'react';
-import { sendJoinGameRequest,sendLeaveLobbyRequest, recievedMessages, socket } from './api';
+import { sendJoinGameRequest,sendLeaveLobbyRequest, recievedMessages, sendStartGameRequest, socket } from './api';
 var localUser = '';
 
 
@@ -68,6 +68,7 @@ export class joinGameID extends Component {
   constructor(props) {
     super(props);
     this.state = {lobbyId: props.match.params, users: []};
+    this.startGame = this.startGame.bind(this);
     this.leaveLobby = this.leaveLobby.bind(this);
     this.addUsers = this.addUsers.bind(this);
   }
@@ -86,17 +87,21 @@ export class joinGameID extends Component {
     }
   }
 
+  startGame() {    
+    sendStartGameRequest(this.state.lobbyId.number);
+    socket.on('startGameConf',function(msg){
+      console.log(msg);
+    }.bind(this));
+  }
+
   leaveLobby() {
+    console.log(this.state.lobbyId.number);
     sendLeaveLobbyRequest(this.state.lobbyId.number);
     localUser = '';
     socket.on('leaveLobby',function(msg){
         this.props.history.push('/');
     }.bind(this));
   }
-
-  // startGame() {
-  //   sendStartGameRequest(localUser, this.state.lobbyId.number);
-  // }
 
   render() {
     socket.on('userJoined',function(msg){
@@ -118,7 +123,7 @@ export class joinGameID extends Component {
           return <li key={index}>{listValue}</li>;
         })}
         </ul>
-        {/* <button onClick={this.startGame}>Start Game</button> */}
+        <button onClick={this.startGame}>Start Game</button>
         <button onClick={this.leaveLobby}>Leave Game</button>
       </div>
     );

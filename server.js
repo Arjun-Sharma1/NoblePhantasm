@@ -5,15 +5,14 @@ var helpers = require('./src/helpers.js');
 var lobbyReg = new HashMap();
 
 
-io.on('connection', function(socket){
+io.on('connection', function(socket) {
     console.log('User ' + socket.id +  ' has connected');
 
     socket.on('disconnect', function(){
         console.log('user disconnected');
     });
 
-    socket.on('newGame', function(name){
-        //helpers.helper1();
+    socket.on('newGame', function(name) {
         console.log("Server has recieved a new game request");
         var lobbyId = helpers.generateLobbyId(lobbyReg);
         var clientMap = new HashMap();
@@ -23,11 +22,11 @@ io.on('connection', function(socket){
         io.local.emit('userJoined', {userId: clientMap.values()});
     });
 
-    socket.on('joinGame', function(name, lobbyId){
+    socket.on('joinGame', function(name, lobbyId) {
         
         console.log("Server has recieved a joinGame request for " + lobbyId + " from " + name);
 
-        if (lobbyReg.has(lobbyId)){
+        if (lobbyReg.has(lobbyId)) {
 
             var clientMap = lobbyReg.get(lobbyId);
 
@@ -45,16 +44,16 @@ io.on('connection', function(socket){
         
     });
 
-    socket.on('leaveLobby', function(lobbyId){
+    socket.on('leaveLobby', function(lobbyId) {
                 
-        if (lobbyReg.has(lobbyId)){
+        if (lobbyReg.has(lobbyId)) {
 
             var clientMap = lobbyReg.get(lobbyId);
             var clientName = clientMap.get(socket.id);            
             
             console.log("Server has recieved a new leave request for user: " + clientName + " in lobby: " + lobbyId);
 
-            if (clientMap.has(socket.id)){
+            if (clientMap.has(socket.id)) {
                 clientMap.remove(socket.id);
                 console.log(clientMap);
                 socket.emit('leaveLobby', {left: 'true'});
@@ -68,21 +67,18 @@ io.on('connection', function(socket){
         }
     });
 
-    socket.on('startGame', function(lobbyId){
+    socket.on('startGame', function(lobbyId) {
+
         console.log("Start game request recieved for " + lobbyId + ", delegating roles...");
-
-        var clientMap = new HashMap(lobbyReg.get(lobbyId));
-        var delegatedRoles = helpers.assignAdmin(socket.id);
-        clientMap.remove(socket.id); //removing this client from hashmap as their role has been assigned as admin
-        var delegatedRoles = helpers.delegate(clientMap);
-
-        lobbyReg.get(lobbyId).forEach(function(value, key) {
-            io.to(element).emit('startGameConf', delegatedRoles);
-        });
-
-        clientMap.forEach(function(element) {
-
-        })
+        var originalMap = lobbyReg.get(lobbyId);
+        var clientMap = new HashMap(originalMap);
+        if(clientMap.size > 5) {
+            var delegatedRoles = helpers.assignAdmin(clientMap, socket.id);            
+            delegatedRoles = helpers.delegate(clientMap, delegatedRoles);
+            lobbyReg.get(lobbyId).forEach(function(value, key) {
+                io.to(key).emit('startGameConf', delegatedRoles);
+            });
+        }
     });
 });
 
