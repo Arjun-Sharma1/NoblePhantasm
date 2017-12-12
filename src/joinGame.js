@@ -1,18 +1,17 @@
 import { Switch, Route } from 'react-router-dom'
 import React, { Component } from 'react';
-import { sendJoinGameRequest,sendLeaveLobbyRequest, recievedMessages, socket } from './api';
+import { sendJoinGameRequest,sendLeaveLobbyRequest, socket } from './api';
 var localUser = '';
 
 
 export class joinGame extends Component {
   constructor(props) {
     super(props);
-    this.state = {lobbyId: '',username: ''};
+    this.state = {lobbyId: '',username: '', errorMessage: ''};
 
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.goToLanding = this.goToLanding.bind(this);
-    recievedMessages();
   }
 
   handleChange(event) {
@@ -20,7 +19,11 @@ export class joinGame extends Component {
   }
 
   handleSubmit(event) {
-    if(this.state.lobbyId !== '' && this.state.username !== ''){
+    if(!this.state.username){
+      this.setState({errorMessage:"Error username is empty"});
+    }else if(!this.state.lobbyId){
+      this.setState({errorMessage:"Error lobby Id is empty"});
+    }else{
       sendJoinGameRequest(this.state.username, this.state.lobbyId);
       let path = this.props.history;
       socket.on('ngConf',function(msg){
@@ -29,8 +32,6 @@ export class joinGame extends Component {
               path.push('/joinGame/'+msg.lobbyId);
           }
       }.bind(this));
-    }else{
-      console.log("error lobbyId empty or username empty");
     }
     //Stop from refreshing the page
     event.preventDefault();
@@ -42,20 +43,27 @@ export class joinGame extends Component {
   }
 
   render() {
+    socket.on('errorMessage',function(msg){
+        console.log(msg);
+        this.setState({errorMessage:msg.errorMessage});
+    }.bind(this));
+
     return (
       <div className="App">
         <header className="App-header">
           <h1 className="App-title">Welcome to Noble Phantasm</h1>
         </header>
         <form id="form4" onSubmit={this.handleSubmit} onChange={this.handleChange}>
-            <input id="username" name='username' value={this.state.username} placeholder="Enter name"/>
+            <input id="username" name='username' value={this.state.username} placeholder="Enter your name"/>
             <br></br>
-            <input id="lobbyId" name='lobbyId' value={this.state.lobbyId} placeholder="Enter Lobby Id"/>
-            <button>Join Game</button>
+            <input id="lobbyId" name='lobbyId' value={this.state.lobbyId} placeholder="Enter the Lobby Id"/>
+            <br></br>
         </form>
-        <button onClick={this.goToLanding}>
+        <button className='buttonPlay' onClick={this.handleSubmit}>Join Game</button>
+        <button className='buttonLeave' onClick={this.goToLanding}>
           Back
         </button>
+        <div className='errorMessage'>{this.state.errorMessage}</div>
         <Switch>
           <Route path='/joinGame/:number' component={joinGameID}/>
         </Switch>
@@ -102,6 +110,11 @@ export class joinGameID extends Component {
         }
     }.bind(this));
 
+    socket.on('errorMessage',function(msg){
+        console.log(msg);
+        this.setState({errorMessage:msg.errorMessage});
+    }.bind(this));
+
     return (
       <div ref="joinGame" className="App">
         <header className="App-header">
@@ -114,8 +127,8 @@ export class joinGameID extends Component {
           return <li key={index}>{listValue}</li>;
         })}
         </ul>
-        <button>Start Game</button>
-        <button onClick={this.leaveLobby}>Leave Game</button>
+        <button className='buttonPlay'>Start Game</button>
+        <button className='buttonLeave' onClick={this.leaveLobby}>Leave Game</button>
       </div>
     );
   }

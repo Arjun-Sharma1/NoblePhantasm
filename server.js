@@ -38,9 +38,12 @@ io.on('connection', function(socket){
                 socket.emit('ngConf', {lobbyId: lobbyId});
                 io.local.emit('userJoined', {userId: clientMap.values()});
             } else {
+                console.log("test");
+                socket.emit('errorMessage', {errorMessage: 'User Already In lobby'});
                 console.log('Client is already in the lobby');
             }
         } else {
+            socket.emit('errorMessage', {errorMessage: 'Lobby does not exist'});
             console.log("Lobby " + lobbyId + " doesn't exist");
         }
 

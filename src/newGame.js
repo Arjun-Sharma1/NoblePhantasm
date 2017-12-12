@@ -1,17 +1,16 @@
 import React, { Component } from 'react';
-import { sendNewGameRequest, recievedMessages, socket } from './api';
+import { sendNewGameRequest, socket } from './api';
 import {setLocalUser} from './joinGame.js';
 
 
 export class newGameCreate extends Component {
   constructor(props) {
     super(props);
-    this.state = {username: ''};
+    this.state = {username: '',errorMessage:''};
 
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.goToLanding = this.goToLanding.bind(this);
-    recievedMessages();
   }
 
   handleChange(event) {
@@ -29,6 +28,7 @@ export class newGameCreate extends Component {
           }
       }.bind(this));
     }else{
+      this.setState({errorMessage: "Error no username entered"});
       console.log("error no username entered");
     }
     //Stop from refreshing the page
@@ -47,13 +47,14 @@ export class newGameCreate extends Component {
           <h1 className="App-title">Welcome to Noble Phantasm</h1>
         </header>
         <form id="form5" onSubmit={this.handleSubmit} onChange={this.handleChange}>
-            <p>Enter name:</p>
             <input id="name" name='username' value={this.state.username} placeholder="Enter name"/>
-            <button>Create Game</button>
+            <br/>
+            <button type="submit" className='buttonPlay'>Create</button>
+            <button type="button" className='buttonLeave' onClick={this.goToLanding}>
+              Back
+            </button>
         </form>
-        <button onClick={this.goToLanding}>
-          Back
-        </button>
+        <div className='errorMessage'>{this.state.errorMessage}</div>
       </div>
     );
   }

@@ -13,13 +13,4 @@ function sendLeaveLobbyRequest(name, lobbyId){
   socket.emit("leaveLobby", name, lobbyId);
 }
 
-function recievedMessages(){
-  socket.on('news',function(msg){
-    console.log(msg);
-  });
-  socket.on('jgConf',function(msg){
-      console.log(msg);
-  });
-}
-
-export { sendNewGameRequest, sendLeaveLobbyRequest, sendJoinGameRequest, recievedMessages, socket};
+export { sendNewGameRequest, sendLeaveLobbyRequest, sendJoinGameRequest, socket};
