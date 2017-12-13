@@ -13,4 +13,8 @@ function sendLeaveLobbyRequest(name, lobbyId){
   socket.emit("leaveLobby", name, lobbyId);
 }
 
-export { sendNewGameRequest, sendLeaveLobbyRequest, sendJoinGameRequest, socket};
+function checkValidLobby(lobbyId){
+  socket.emit("checkLobby", lobbyId);
+}
+
+export { sendNewGameRequest, sendLeaveLobbyRequest, checkValidLobby, sendJoinGameRequest, socket};

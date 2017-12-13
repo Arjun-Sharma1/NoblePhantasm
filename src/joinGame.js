@@ -1,6 +1,6 @@
 import { Switch, Route } from 'react-router-dom'
 import React, { Component } from 'react';
-import { sendJoinGameRequest,sendLeaveLobbyRequest, socket } from './api';
+import { sendJoinGameRequest,sendLeaveLobbyRequest, checkValidLobby, socket } from './api';
 var localUser = '';
 
 
@@ -83,6 +83,7 @@ export class joinGameID extends Component {
     this.state = {lobbyId: props.match.params, users: []};
     this.leaveLobby = this.leaveLobby.bind(this);
     this.addUsers = this.addUsers.bind(this);
+    checkValidLobby(this.state.lobbyId.number);
   }
 
   addUsers(username){
@@ -110,14 +111,19 @@ export class joinGameID extends Component {
   render() {
     socket.on(this.state.lobbyId.number,function(msg){
         if(msg.userId !== undefined && !this.state.users.includes(msg.userId) && localUser !== ''){
-          console.log(msg.userId);
           this.addUsers(msg.userId);
         }
     }.bind(this));
 
     socket.on('errorMessage',function(msg){
-        console.log(msg);
         this.setState({errorMessage:msg.errorMessage});
+    }.bind(this));
+
+    socket.on('checkLobby',function(msg){
+        console.log(msg);
+        if(this.state.users.length === 0 || msg.valid === 'false'){
+          this.props.history.push('/');
+        }
     }.bind(this));
 
     return (

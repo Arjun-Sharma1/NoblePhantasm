@@ -101,6 +101,14 @@ io.on('connection', function(socket){
 
         })
     });
+
+    socket.on('checkLobby', function(lobbyId){
+        if (lobbyReg.has(lobbyId)){
+          socket.emit('checkLobby', {valid: 'true'});
+        }else{
+          socket.emit('checkLobby',{valid: 'false'});
+        }
+    });
 });
 
 const port = 8000;
