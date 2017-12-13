@@ -9,11 +9,23 @@ io.on('connection', function(socket){
     console.log('User ' + socket.id +  ' has connected');
 
     socket.on('disconnect', function(){
+        console.log(lobbyReg.entries());
+        let holder = lobbyReg.entries();
+        for(var i=0; i < holder.length;i++){
+          if(holder[i][1].has(socket.id)){
+            holder[i][1].delete(socket.id);
+            io.local.emit(holder[i][0], {userId: holder[i][1].values()});
+            if(holder[i][1].size == 0){
+              lobbyReg.delete(holder[i][0]);
+              console.log("Removed dead Lobby: "+ holder[i][0]);
+            }
+            break;
+          }
+        }
         console.log('user disconnected');
     });
 
     socket.on('newGame', function(name){
-        //helpers.helper1();
         console.log("Server has recieved a new game request");
 
         var lobbyId = helpers.generateLobbyId(lobbyReg);
@@ -21,7 +33,7 @@ io.on('connection', function(socket){
         clientMap.set(socket.id, name);
         lobbyReg.set(lobbyId, clientMap);
         socket.emit('ngConf', { lobbyId: lobbyId});
-        io.local.emit('userJoined', {userId: clientMap.values()});
+        io.local.emit(lobbyId, {userId: clientMap.values()});
     });
 
     socket.on('joinGame', function(name, lobbyId){
@@ -36,9 +48,8 @@ io.on('connection', function(socket){
                 clientMap.set(socket.id, name);
                 lobbyReg.set(lobbyId, clientMap);
                 socket.emit('ngConf', {lobbyId: lobbyId});
-                io.local.emit('userJoined', {userId: clientMap.values()});
+                io.local.emit(lobbyId, {userId: clientMap.values()});
             } else {
-                console.log("test");
                 socket.emit('errorMessage', {errorMessage: 'User Already In lobby'});
                 console.log('Client is already in the lobby');
             }
@@ -58,11 +69,14 @@ io.on('connection', function(socket){
             var clientMap = lobbyReg.get(lobbyId);
 
             if (clientMap.has(socket.id)){
-                clientMap.remove(socket.id, name);
-                console.log(clientMap);
+                clientMap.delete(socket.id, name);
                 socket.emit('leaveLobby', {left: 'true'});
-                io.local.emit('userJoined', {userId: clientMap.values()});
+                io.local.emit(lobbyId, {userId: clientMap.values()});
                 console.log(name+" has left the lobby successfully");
+                if(clientMap.size == 0){
+                  lobbyReg.delete(lobbyId);
+                  console.log("Removed dead Lobby: "+ lobbyId);
+                }
             } else {
                 console.log('Client has already left the lobby or clientName does not exist');
             }
@@ -76,7 +90,7 @@ io.on('connection', function(socket){
 
         var clientMap = new HashMap(lobbyReg.get(lobbyId));
         var delegatedRoles = helpers.assignAdmin(socket.id);
-        clientMap.remove(socket.id); //removing this client from hashmap as their role has been assigned as admin
+        clientMap.delete(socket.id); //removing this client from hashmap as their role has been assigned as admin
         var delegatedRoles = helpers.delegate(clientMap);
 
         lobbyReg.get(lobbyId).forEach(function(value, key) {

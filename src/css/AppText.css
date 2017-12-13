@@ -11,7 +11,33 @@ url("fonts/simplifica_typeface-webfont.woff") format("woff")
  font-size: 24px;
 }
 
-h1 { color: #111; font-family: 'Simplifica', sans-serif; font-size: 50px; font-weight: bold; letter-spacing: -1px; line-height: 1; text-align: center; }
+h1 {
+  color: #111;
+  font-family: 'Simplifica', sans-serif;
+  font-size: 60px;
+  font-weight: bold;
+  line-height: 1;
+  text-align: center;
+  margin-top: 50px;
+}
+
+h2 {
+  color: #111;
+  font-family: 'Simplifica', sans-serif;
+  font-size: 40px;
+  font-weight: bold;
+  line-height: 1;
+  text-align: center;
+  margin: 15px;
+}
+
+.textBox{
+  height: 40px;
+  font-size: 30px;
+  width: 300px;
+  margin: 5px 0px;
+  text-align: center;
+}
 
 .errorMessage {
     font-size: 30px;

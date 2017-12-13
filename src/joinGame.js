@@ -54,9 +54,9 @@ export class joinGame extends Component {
           <h1 className="App-title">Welcome to Noble Phantasm</h1>
         </header>
         <form id="form4" onSubmit={this.handleSubmit} onChange={this.handleChange}>
-            <input id="username" name='username' value={this.state.username} placeholder="Enter your name"/>
+            <input className='textBox' id="username" name='username' value={this.state.username} placeholder="Enter your name"/>
             <br></br>
-            <input id="lobbyId" name='lobbyId' value={this.state.lobbyId} placeholder="Enter the Lobby Id"/>
+            <input className='textBox' id="lobbyId" name='lobbyId' value={this.state.lobbyId} placeholder="Enter the Lobby Id"/>
             <br></br>
         </form>
         <button className='buttonPlay' onClick={this.handleSubmit}>Join Game</button>
@@ -71,6 +71,11 @@ export class joinGame extends Component {
     );
   }
 }
+
+
+
+///////////////////////////////////////////////////////////////////////////////
+
 
 export class joinGameID extends Component {
   constructor(props) {
@@ -103,7 +108,7 @@ export class joinGameID extends Component {
   }
 
   render() {
-    socket.on('userJoined',function(msg){
+    socket.on(this.state.lobbyId.number,function(msg){
         if(msg.userId !== undefined && !this.state.users.includes(msg.userId) && localUser !== ''){
           console.log(msg.userId);
           this.addUsers(msg.userId);
@@ -119,8 +124,8 @@ export class joinGameID extends Component {
       <div ref="joinGame" className="App">
         <header className="App-header">
           <h1 className="App-title">Waiting for Players...</h1>
-          <h3>Lobby Code: {this.state.lobbyId.number}</h3>
-          <h4>Current People in Lobby: </h4>
+          <h2>Lobby Code: {this.state.lobbyId.number}</h2>
+          <h3>Current People in Lobby: </h3>
         </header>
         <ul>
         {this.state.users.map(function(listValue,index){

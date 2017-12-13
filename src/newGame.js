@@ -47,7 +47,7 @@ export class newGameCreate extends Component {
           <h1 className="App-title">Welcome to Noble Phantasm</h1>
         </header>
         <form id="form5" onSubmit={this.handleSubmit} onChange={this.handleChange}>
-            <input id="name" name='username' value={this.state.username} placeholder="Enter name"/>
+            <input className='textBox' id="name" name='username' value={this.state.username} placeholder="Enter your name"/>
             <br/>
             <button type="submit" className='buttonPlay'>Create</button>
             <button type="button" className='buttonLeave' onClick={this.goToLanding}>
