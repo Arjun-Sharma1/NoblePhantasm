@@ -72,11 +72,15 @@ io.on('connection', function(socket) {
         console.log("Start game request recieved for " + lobbyId + ", delegating roles...");
         var originalMap = lobbyReg.get(lobbyId);
         var clientMap = new HashMap(originalMap);
-        if(clientMap.size > 5) {
+        if(clientMap.size > 1) { // Change this to 5, 1 is just for testing
             var delegatedRoles = helpers.assignAdmin(clientMap, socket.id);            
             delegatedRoles = helpers.delegate(clientMap, delegatedRoles);
             lobbyReg.get(lobbyId).forEach(function(value, key) {
                 io.to(key).emit('startGameConf', delegatedRoles);
+            });
+        } else {
+            lobbyReg.get(lobbyId).forEach(function(value, key) {
+                io.to(key).emit('startGameConf', 'Not enough players');
             });
         }
     });

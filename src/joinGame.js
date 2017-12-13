@@ -1,8 +1,10 @@
 import { Switch, Route } from 'react-router-dom'
 import React, { Component } from 'react';
 import { sendJoinGameRequest,sendLeaveLobbyRequest, recievedMessages, sendStartGameRequest, socket } from './api';
-var localUser = '';
+var HashMap = require('hashmap');
 
+var localUser = "";
+//var assignedRoles = new HashMap();
 
 export class joinGame extends Component {
   constructor(props) {
@@ -71,6 +73,7 @@ export class joinGameID extends Component {
     this.startGame = this.startGame.bind(this);
     this.leaveLobby = this.leaveLobby.bind(this);
     this.addUsers = this.addUsers.bind(this);
+    this.decidePage = this.decidePage.bind(this);
   }
 
   addUsers(username){
@@ -88,27 +91,47 @@ export class joinGameID extends Component {
   }
 
   startGame() {    
-    sendStartGameRequest(this.state.lobbyId.number);
-    socket.on('startGameConf',function(msg){
-      console.log(msg);
-    }.bind(this));
+    sendStartGameRequest(this.state.lobbyId.number);    
   }
 
   leaveLobby() {
     console.log(this.state.lobbyId.number);
     sendLeaveLobbyRequest(this.state.lobbyId.number);
     localUser = '';
-    socket.on('leaveLobby',function(msg){
+    socket.on('leaveLobby',function(msg) {
         this.props.history.push('/');
     }.bind(this));
   }
 
+  decidePage(assignedRoles){
+    console.log("user ::  " + assignedRoles.get(localUser));
+    if(assignedRoles.get(localUser) != "admin") {
+      //this.props.history.push('/game');
+      this.props.
+      this.context.router.history.push({
+        pathname: '/game',
+        state: {roles: assignedRoles}
+      });
+    } else {
+      //this.props.history.push('/admin');
+      this.context.router.history.push({
+        pathname: '/admin',
+        state: {roles: assignedRoles}
+      });
+    }
+  }
+
   render() {
-    socket.on('userJoined',function(msg){
-        if(msg.userId !== undefined && !this.state.users.includes(msg.userId) && localUser !== ''){
+    socket.on('userJoined',function(msg) {
+        if(msg.userId !== undefined && !this.state.users.includes(msg.userId) && localUser !== '') {
           console.log(msg.userId);
           this.addUsers(msg.userId);
         }
+    }.bind(this));
+
+    socket.on('startGameConf', function(msg) {     
+      var assignedRoles = new HashMap(msg);      
+      this.decidePage(assignedRoles);      
     }.bind(this));
 
     return (
@@ -119,7 +142,7 @@ export class joinGameID extends Component {
           <h4>Current People in Lobby: </h4>
         </header>
         <ul>
-        {this.state.users.map(function(listValue,index){
+        {this.state.users.map(function(listValue,index) {
           return <li key={index}>{listValue}</li>;
         })}
         </ul>
