@@ -131,7 +131,7 @@ export class joinGameID extends Component {
           <h1 className="App-title">Waiting for Players...</h1>
           <h3>Lobby Code: {this.state.lobbyId.number}</h3>
           <h4>Current People in Lobby: </h4>
-        </header>
+        </header>        
         <ul>
         {this.state.users.map(function(listValue,index) {
           return <li key={index}>{listValue}</li>;

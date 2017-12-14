@@ -33,9 +33,10 @@ export class admin extends Component {
             <div>
                 <h1>{this.state.username}</h1>
                 <h3>{this.state.userRole}</h3>
+                <p>Power Used || Dead</p>
                 <ul>
                     {this.extractRoles().map(function(listValue,index) {
-                    return <li key={index}>{listValue}</li>;
+                    return <li key={index}><input type="checkbox"/><input type="checkbox"/> {listValue}</li>;
                     })}
                 </ul>                
             </div>
