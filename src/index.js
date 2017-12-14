@@ -1,12 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-//import './index.css';
 import { BrowserRouter, Switch, Route } from 'react-router-dom'
 import App from './App';
 import {joinGame, joinGameID} from './joinGame.js';
 import {newGameCreate} from './newGame.js';
-
-
+import {game} from './game.js';
+import {admin} from './admin.js';
 
 ReactDOM.render((
   <BrowserRouter>
@@ -16,6 +15,8 @@ ReactDOM.render((
         <Route exact path='/joinGame' component={joinGame}/>
         <Route exact path='/joinGame/:number' component={joinGameID}/>
         <Route exact path='/newGame' component={newGameCreate}/>
+        <Route exact path='/game' component={game}/>
+        <Route exact path='/admin' component={admin}/>
       </Switch>
     </div>
   </BrowserRouter>

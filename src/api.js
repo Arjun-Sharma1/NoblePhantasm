@@ -9,12 +9,26 @@ function sendJoinGameRequest(name, lobbyId){
   socket.emit("joinGame", name, lobbyId);
 }
 
-function sendLeaveLobbyRequest(name, lobbyId){
-  socket.emit("leaveLobby", name, lobbyId);
+function sendLeaveLobbyRequest(lobbyId){
+  socket.emit("leaveLobby", lobbyId);
+}
+
+function sendStartGameRequest(lobbyId){
+  socket.emit("startGame", lobbyId);
+}
+
+function recievedMessages(){
+  socket.on('news',function(msg){
+    console.log(msg);
+  });
+  socket.on('jgConf',function(msg){
+    console.log(msg);
+  });
 }
 
 function checkValidLobby(lobbyId){
   socket.emit("checkLobby", lobbyId);
 }
 
-export { sendNewGameRequest, sendLeaveLobbyRequest, checkValidLobby, sendJoinGameRequest, socket};
+export { sendNewGameRequest, sendLeaveLobbyRequest, sendJoinGameRequest, recievedMessages, sendStartGameRequest, checkValidLobby, socket};
+

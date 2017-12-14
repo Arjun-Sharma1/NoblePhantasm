@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-//import logo from './logo.svg';
+import {recievedMessages } from './api';
 import './css/AppButton.css';
 import './css/AppText.css';
 import './css/AppTextBox.css';
