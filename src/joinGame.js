@@ -1,6 +1,6 @@
 import { Switch, Route } from 'react-router-dom'
 import React, { Component } from 'react';
-import { sendJoinGameRequest,sendLeaveLobbyRequest, recievedMessages, sendStartGameRequest, socket, checkValidLobby } from './api';
+import { sendJoinGameRequest,sendLeaveLobbyRequest, sendStartGameRequest, socket, checkValidLobby } from './api';
 var HashMap = require('hashmap');
 var localUser = "";
 var rolesRegistry;
@@ -98,8 +98,8 @@ export class joinGameID extends Component {
     }
   }
 
-  startGame() {    
-    sendStartGameRequest(this.state.lobbyId.number);    
+  startGame() {
+    sendStartGameRequest(this.state.lobbyId.number);
   }
 
   leaveLobby() {
@@ -114,32 +114,32 @@ export class joinGameID extends Component {
   decidePage(assignedRoles){
     rolesRegistry = assignedRoles;
     if(assignedRoles.get(localUser) != "admin") {
-      this.props.history.push('/game');      
-    } else {      
+      this.props.history.push('/game');
+    } else {
       this.props.history.push('/admin');
     }
   }
 
   render() {
-    
+
     socket.on('userJoined',function(msg) {
       if(msg.userId !== undefined && !this.state.users.includes(msg.userId) && localUser !== '') {
         console.log(msg.userId);
         this.addUsers(msg.userId);
       }
     }.bind(this));
-    
+
     socket.on(this.state.lobbyId.number,function(msg){
         if(msg.userId !== undefined && !this.state.users.includes(msg.userId) && localUser !== ''){
           this.addUsers(msg.userId);
         }
     }.bind(this));
 
-    socket.on('startGameConf', function(msg) {     
-      var assignedRoles = new HashMap(msg);      
+    socket.on('startGameConf', function(msg) {
+      var assignedRoles = new HashMap(msg);
       this.decidePage(assignedRoles);
     }.bind(this));
-          
+
     socket.on('errorMessage',function(msg){
         this.setState({errorMessage:msg.errorMessage});
     }.bind(this));

@@ -17,7 +17,6 @@ h1 {
   font-size: 60px;
   font-weight: bold;
   line-height: 1;
-  text-align: center;
   margin-top: 50px;
 }
 
@@ -30,6 +29,8 @@ h2 {
   text-align: center;
   margin: 15px;
 }
+
+ul{ list-style-type: none; }
 
 .textBox{
   height: 40px;

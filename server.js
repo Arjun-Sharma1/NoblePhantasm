@@ -36,7 +36,7 @@ io.on('connection', function(socket) {
     });
 
     socket.on('joinGame', function(name, lobbyId) {
-        
+
         console.log("Server has recieved a joinGame request for " + lobbyId + " from " + name);
 
         if (lobbyReg.has(lobbyId)) {
@@ -56,23 +56,23 @@ io.on('connection', function(socket) {
             socket.emit('errorMessage', {errorMessage: 'Lobby does not exist'});
             console.log("Lobby " + lobbyId + " doesn't exist");
         }
-        
+
     });
 
     socket.on('leaveLobby', function(lobbyId) {
-                
+
         if (lobbyReg.has(lobbyId)) {
 
             var clientMap = lobbyReg.get(lobbyId);
-            var clientName = clientMap.get(socket.id);            
-            
+            var clientName = clientMap.get(socket.id);
+
             console.log("Server has recieved a new leave request for user: " + clientName + " in lobby: " + lobbyId);
 
             if (clientMap.has(socket.id)){
-                clientMap.delete(socket.id, name);
+                clientMap.delete(socket.id, clientName);
                 socket.emit('leaveLobby', {left: 'true'});
                 io.local.emit(lobbyId, {userId: clientMap.values()});
-                console.log(name+" has left the lobby successfully");
+                console.log(clientName+" has left the lobby successfully");
                 if(clientMap.size == 0){
                   lobbyReg.delete(lobbyId);
                   console.log("Removed dead Lobby: "+ lobbyId);
@@ -91,7 +91,7 @@ io.on('connection', function(socket) {
         var originalMap = lobbyReg.get(lobbyId);
         var clientMap = new HashMap(originalMap);
         if(clientMap.size > 1) {
-            var delegatedRoles = helpers.assignAdmin(clientMap, socket.id);            
+            var delegatedRoles = helpers.assignAdmin(clientMap, socket.id);
             delegatedRoles = helpers.delegate(clientMap, delegatedRoles);
             lobbyReg.get(lobbyId).forEach(function(value, key) {
                 io.to(key).emit('startGameConf', delegatedRoles);

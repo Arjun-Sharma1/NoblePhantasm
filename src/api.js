@@ -17,18 +17,8 @@ function sendStartGameRequest(lobbyId){
   socket.emit("startGame", lobbyId);
 }
 
-function recievedMessages(){
-  socket.on('news',function(msg){
-    console.log(msg);
-  });
-  socket.on('jgConf',function(msg){
-    console.log(msg);
-  });
-}
-
 function checkValidLobby(lobbyId){
   socket.emit("checkLobby", lobbyId);
 }
 
-export { sendNewGameRequest, sendLeaveLobbyRequest, sendJoinGameRequest, recievedMessages, sendStartGameRequest, checkValidLobby, socket};
-
+export { sendNewGameRequest, sendLeaveLobbyRequest, sendJoinGameRequest, sendStartGameRequest, checkValidLobby, socket};
