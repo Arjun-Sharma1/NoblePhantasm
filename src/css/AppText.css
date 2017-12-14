@@ -1,14 +1,13 @@
 @font-face {
-font-family: "Simplifica";
-src: url("fonts/Simplifica.ttf");
-src:
-url("fonts/simplifica_typeface-webfont.woff") format("woff")
+  font-family: "Simplifica";
+  src: url("fonts/Simplifica.ttf");
+  src: url("fonts/simplifica_typeface-webfont.woff") format("woff")
 }
 
 * {
- font-size: 100%;
- font-family: 'Simplifica';
- font-size: 24px;
+  font-size: 100%;
+  font-family: 'Simplifica';
+  font-size: 24px;
 }
 
 h1 {
@@ -30,9 +29,7 @@ h2 {
   margin: 15px;
 }
 
-ul{ list-style-type: none; }
-
-.textBox{
+.textBox {
   height: 40px;
   font-size: 30px;
   width: 300px;
@@ -41,10 +38,10 @@ ul{ list-style-type: none; }
 }
 
 .errorMessage {
-    font-size: 30px;
-    font-weight:800;
-    letter-spacing: 2px;
-    margin: 5px 0px;
-    padding:12px;
-    color: #D8000C;
+  font-size: 30px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  margin: 5px 0px;
+  padding: 12px;
+  color: #D8000C;
 }

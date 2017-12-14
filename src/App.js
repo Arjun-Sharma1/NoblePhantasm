@@ -1,13 +1,18 @@
 import React, { Component } from 'react';
-import {recievedMessages } from './api';
 import './css/AppButton.css';
 import './css/AppText.css';
 import './css/AppTextBox.css';
+import './css/AppList.css';
+
 
 class App extends Component {
   constructor(props) {
     super(props);
-    this.state = {name: '', gameCode: '', message: ''};
+    this.state = {
+      name: '',
+      gameCode: '',
+      message: ''
+    };
 
     this.goToNewGame = this.goToNewGame.bind(this);
     this.goToJoinGame = this.goToJoinGame.bind(this);

@@ -2,11 +2,13 @@ import React, { Component } from 'react';
 import { sendNewGameRequest, socket } from './api';
 import {setLocalUser} from './joinGame.js';
 
-
 export class newGameCreate extends Component {
   constructor(props) {
     super(props);
-    this.state = {username: '',errorMessage:''};
+    this.state = {
+      username: '',
+      errorMessage: ''
+    };
 
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleChange = this.handleChange.bind(this);
@@ -14,21 +16,25 @@ export class newGameCreate extends Component {
   }
 
   handleChange(event) {
-    this.setState({[event.target.name]: event.target.value});
+    this.setState({
+      [event.target.name]: event.target.value
+    });
   }
 
   handleSubmit(event) {
-    if(this.state.username !== ''){
+    if (this.state.username !== '') {
       sendNewGameRequest(this.state.username);
       let path = this.props.history;
-      socket.on('ngConf',function(msg){
-          if(msg.lobbyId !== ''){
-            setLocalUser(this.state.username);
-            path.push('/joinGame/'+msg.lobbyId);
-          }
+      socket.on('ngConf', function(msg) {
+        if (msg.lobbyId !== '') {
+          setLocalUser(this.state.username);
+          path.push('/joinGame/' + msg.lobbyId);
+        }
       }.bind(this));
-    }else{
-      this.setState({errorMessage: "Error no username entered"});
+    } else {
+      this.setState({
+        errorMessage: "Error no username entered"
+      });
       console.log("error no username entered");
     }
     //Stop from refreshing the page
@@ -38,7 +44,6 @@ export class newGameCreate extends Component {
   goToLanding() {
     this.props.history.push('/');
   }
-
 
   render() {
     return (

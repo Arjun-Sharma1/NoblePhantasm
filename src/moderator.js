@@ -1,13 +1,10 @@
-import { Switch, Route } from 'react-router-dom'
 import React, { Component } from 'react';
 import {rolesRegistry, localUser} from './joinGame';
 var HashMap = require('hashmap');
 
 var roles;
-var rolesArray = [];
+export class moderator extends Component {
 
-export class admin extends Component {
-    
     constructor(props) {
         super(props);
         this.state = {username: '', userRole: ''};
@@ -16,11 +13,11 @@ export class admin extends Component {
         this.state.userRole = roles.get(localUser);
         this.extractRoles = this.extractRoles.bind(this);
     }
-    
+
     extractRoles(){
         var temp = [];
         roles.forEach(function(value, key) {
-            temp.push(key + ': ' + value);    
+            temp.push(key + ': ' + value);
         });
         return temp;
      }
@@ -30,16 +27,18 @@ export class admin extends Component {
         this.extractRoles();
 
         return (
-            <div>
-                <h1>{this.state.username}</h1>
-                <h3>{this.state.userRole}</h3>
-                <p>Power Used || Dead</p>
-                <ul>
-                    {this.extractRoles().map(function(listValue,index) {
-                    return <li key={index}><input type="checkbox"/><input type="checkbox"/> {listValue}</li>;
-                    })}
-                </ul>                
-            </div>
+          <div ref="moderator" className="App">
+              <div>
+                  <h1>{this.state.username}</h1>
+                  <h3>You're the {this.state.userRole}!</h3>
+                  <p>Power Used || Dead</p>
+                  <ul>
+                      {this.extractRoles().map(function(listValue,index) {
+                      return <li key={index}><input type="checkbox"/><input type="checkbox"/><a href="#"> {listValue}</a></li>;
+                      })}
+                  </ul>
+              </div>
+          </div>
         );
     }
 }

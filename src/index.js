@@ -5,7 +5,7 @@ import App from './App';
 import {joinGame, joinGameID} from './joinGame.js';
 import {newGameCreate} from './newGame.js';
 import {game} from './game.js';
-import {admin} from './admin.js';
+import {moderator} from './moderator.js';
 
 ReactDOM.render((
   <BrowserRouter>
@@ -16,7 +16,7 @@ ReactDOM.render((
         <Route exact path='/joinGame/:number' component={joinGameID}/>
         <Route exact path='/newGame' component={newGameCreate}/>
         <Route exact path='/game' component={game}/>
-        <Route exact path='/admin' component={admin}/>
+        <Route exact path='/moderator' component={moderator}/>
       </Switch>
     </div>
   </BrowserRouter>
