@@ -4,7 +4,7 @@ import { sendJoinGameRequest,sendLeaveLobbyRequest, recievedMessages, sendStartG
 var HashMap = require('hashmap');
 
 var localUser = "";
-//var assignedRoles = new HashMap();
+var rolesRegistry;
 
 export class joinGame extends Component {
   constructor(props) {
@@ -104,20 +104,11 @@ export class joinGameID extends Component {
   }
 
   decidePage(assignedRoles){
-    console.log("user ::  " + assignedRoles.get(localUser));
+    rolesRegistry = assignedRoles;
     if(assignedRoles.get(localUser) != "admin") {
-      //this.props.history.push('/game');
-      this.props.
-      this.context.router.history.push({
-        pathname: '/game',
-        state: {roles: assignedRoles}
-      });
-    } else {
-      //this.props.history.push('/admin');
-      this.context.router.history.push({
-        pathname: '/admin',
-        state: {roles: assignedRoles}
-      });
+      this.props.history.push('/game');      
+    } else {      
+      this.props.history.push('/admin');
     }
   }
 
@@ -157,4 +148,4 @@ function setLocalUser(username){
   localUser = username;
 };
 
-export { setLocalUser};
+export {setLocalUser, rolesRegistry, localUser};
