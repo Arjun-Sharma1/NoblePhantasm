@@ -26,4 +26,9 @@ function recievedMessages(){
   });
 }
 
-export { sendNewGameRequest, sendLeaveLobbyRequest, sendJoinGameRequest, recievedMessages, sendStartGameRequest, socket};
+function checkValidLobby(lobbyId){
+  socket.emit("checkLobby", lobbyId);
+}
+
+export { sendNewGameRequest, sendLeaveLobbyRequest, sendJoinGameRequest, recievedMessages, sendStartGameRequest, checkValidLobby, socket};
+

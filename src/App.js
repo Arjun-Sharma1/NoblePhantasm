@@ -1,5 +1,8 @@
 import React, { Component } from 'react';
 import {recievedMessages } from './api';
+import './css/AppButton.css';
+import './css/AppText.css';
+import './css/AppTextBox.css';
 
 class App extends Component {
   constructor(props) {
@@ -8,8 +11,6 @@ class App extends Component {
 
     this.goToNewGame = this.goToNewGame.bind(this);
     this.goToJoinGame = this.goToJoinGame.bind(this);
-
-    recievedMessages();
   }
 
   goToNewGame() {
@@ -26,12 +27,20 @@ class App extends Component {
         <header className="App-header">
           <h1 className="App-title">Welcome to Noble Phantasm</h1>
         </header>
-        <button onClick={this.goToNewGame}>
-          New Game
-        </button>
-        <button onClick={this.goToJoinGame}>
-          Join Game
-        </button>
+        <div className="button_base b03_skewed_slide_in">
+          <div onClick={this.goToNewGame}>New Game</div>
+          <div></div>
+          <div onClick={this.goToNewGame}>New Game</div>
+        </div>
+        <div className="button_base b03_skewed_slide_in">
+          <div onClick={this.goToJoinGame}>Join Game</div>
+          <div></div>
+          <div onClick={this.goToJoinGame}>Join Game</div>
+        </div>
+        <p className="footer">
+          Created by: <a href="https://github.com/Arjun-Sharma1" rel="noopener noreferrer" target="_blank">Arjun</a> and &nbsp;
+          <a href="https://github.com/aarb1" rel="noopener noreferrer" target="_blank">Aayush</a>
+        </p>
       </div>
     );
   }
