@@ -2,10 +2,11 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { BrowserRouter, Switch, Route } from 'react-router-dom'
 import App from './App';
-import {joinGame, joinGameID} from './joinGame.js';
+import {joinGame} from './joinGame.js';
 import {newGameCreate} from './newGame.js';
 import {game} from './game.js';
 import {moderator} from './moderator.js';
+import {joinGameID} from './joinGameID.js';
 
 ReactDOM.render((
   <BrowserRouter>
@@ -17,6 +18,7 @@ ReactDOM.render((
         <Route exact path='/newGame' component={newGameCreate}/>
         <Route exact path='/game' component={game}/>
         <Route exact path='/moderator' component={moderator}/>
+        <Route path='/joinGame/:number' component={joinGameID}/>
       </Switch>
     </div>
   </BrowserRouter>

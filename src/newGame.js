@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { sendNewGameRequest, socket } from './api';
-import {setLocalUser} from './joinGame.js';
+import {setLocalUser} from './joinGameID.js';
 
 export class newGameCreate extends Component {
   constructor(props) {

@@ -126,8 +126,10 @@
 
 .buttonPlay:hover {
   background: green !important;
+  cursor:'pointer';
 }
 
 .buttonLeave:hover {
   background: red !important;
+  cursor:'pointer';
 }

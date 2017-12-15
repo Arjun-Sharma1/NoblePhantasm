@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {rolesRegistry, localUser} from './joinGame';
+import {rolesRegistry, localUser} from './joinGameID';
 var HashMap = require('hashmap');
 
 var roles;
