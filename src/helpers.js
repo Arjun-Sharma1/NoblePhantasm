@@ -18,7 +18,13 @@ module.exports = {
 
     delegatedRoles.set(clientMap.get(clientIds[0]), "assassin");
 
-    for (var i = 1; i < clientIds.length; i++) {
+    delegatedRoles.set(clientMap.get(clientIds[1]), "Jester");
+
+    delegatedRoles.set(clientMap.get(clientIds[2]), "Doctor");
+
+    delegatedRoles.set(clientMap.get(clientIds[3]), "Detective");
+
+    for (var i = 4; i < clientIds.length; i++) {
       delegatedRoles.set(clientMap.get(clientIds[i]), "townee");
     }
 

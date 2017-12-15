@@ -135,6 +135,6 @@ io.on('connection', function(socket) {
 
 });
 
-var port = process.env.PORT;
+const port = 8000;
 io.listen(port);
 console.log('listening on port ', port);
