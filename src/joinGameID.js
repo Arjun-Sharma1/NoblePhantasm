@@ -50,7 +50,6 @@ export class joinGameID extends Component {
   }
 
   startGame() {
-    console.log(this.state.users.length);
     if (this.state.users.length >= 2) {
       sendStartGameRequest(this.state.lobbyId.number);
     } else {
@@ -61,7 +60,6 @@ export class joinGameID extends Component {
   }
 
   leaveLobby() {
-    console.log(this.state.lobbyId.number);
     sendLeaveLobbyRequest(this.state.lobbyId.number);
     localUser = '';
     socket.on('leaveLobby', function(msg) {
@@ -107,7 +105,6 @@ export class joinGameID extends Component {
       }.bind(this));
 
       socket.on('checkLobby', function(msg) {
-        console.log(msg);
         if (!localUser || msg.valid === 'false') {
           this.props.history.push('/');
         }

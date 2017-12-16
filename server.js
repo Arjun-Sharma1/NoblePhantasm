@@ -1,4 +1,8 @@
-const io = require('socket.io')();
+var express = require('express');
+var app = express()
+  , server = require('http').createServer(app)
+  , io = require('socket.io').listen(server);
+
 var HashMap = require('hashmap');
 var helpers = require('./src/helpers.js');
 
@@ -135,6 +139,11 @@ io.on('connection', function(socket) {
 
 });
 
-const port = 8000;
-io.listen(port);
+const port = process.env.PORT || 8000;
+if(port !== 8000){
+  console.log("Using production Build");
+  app.use(express.static('build'));
+}
+
+server.listen(port);
 console.log('listening on port ', port);

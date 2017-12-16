@@ -32,15 +32,19 @@ class App extends Component {
         <header className="App-header">
           <h1 className="App-title">Welcome to Noble Phantasm</h1>
         </header>
-        <div className="button_base b03_skewed_slide_in">
-          <div onClick={this.goToNewGame}>New Game</div>
-          <div></div>
-          <div onClick={this.goToNewGame}>New Game</div>
+        <div className='button_base'>
+          <div className="button_base b03_skewed_slide_in">
+            <div onClick={this.goToNewGame}>New Game</div>
+            <div></div>
+            <div onClick={this.goToNewGame}>New Game</div>
+          </div>
         </div>
-        <div className="button_base b03_skewed_slide_in">
-          <div onClick={this.goToJoinGame}>Join Game</div>
-          <div></div>
-          <div onClick={this.goToJoinGame}>Join Game</div>
+        <div className='button_base'>
+          <div className="button_base b03_skewed_slide_in">
+            <div onClick={this.goToJoinGame}>Join Game</div>
+            <div></div>
+            <div onClick={this.goToJoinGame}>Join Game</div>
+          </div>
         </div>
         <p className="footer">
           Created by: <a href="https://github.com/Arjun-Sharma1" rel="noopener noreferrer" target="_blank">Arjun</a> and &nbsp;
