@@ -1,6 +1,6 @@
 # NoblePhantasm
 
-#Instructions for Heroku Deployment
+## Instructions for Heroku Deployment
 1) Create heroku account and loging using `heroku login`
 2) Run command `heroku app create`
 3) Run command `npm run build` (Creates static html,css, js files rather then using react server)
