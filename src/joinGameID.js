@@ -2,6 +2,11 @@ import React, { Component } from 'react';
 import { sendLeaveLobbyRequest, sendStartGameRequest, socket, checkValidLobby } from './api';
 var HashMap = require('hashmap');
 var localUser = "";
+var assassinTag = "assassin";
+var vigilanteTag = "vigilante";
+var doctorTag = "doctor";
+var detectiveTag = "detective";
+var jesterTag = "jester";
 var rolesRegistry;
 
 
@@ -12,18 +17,20 @@ export class joinGameID extends Component {
       lobbyId: props.match.params,
       users: [],
       errorMessage: '',
-      vigilante:false,
-      doctor:false,
-      jester:false,
-      detective:false,
-      assassin:''
+      vigilante:0,
+      doctor:0,
+      jester:0,
+      detective:0,
+      assassin:0
     };
+
     this.startGame = this.startGame.bind(this);
     this.leaveLobby = this.leaveLobby.bind(this);
     this.addUsers = this.addUsers.bind(this);
     this.decidePage = this.decidePage.bind(this);
-    this.handleInputChange = this.handleInputChange.bind(this);
     this.handleChange = this.handleChange.bind(this);
+    this.decrementRoleCountHandler = this.decrementRoleCountHandler.bind(this);
+    this.incrementRoleCountHandler = this.incrementRoleCountHandler.bind(this);
     checkValidLobby(this.state.lobbyId.number);
   }
 
@@ -76,39 +83,91 @@ export class joinGameID extends Component {
     }
   }
 
-  handleInputChange(event) {
-  const target = event.target;
-  const value = target.type === 'checkbox' ? target.checked : target.value;
-  const name = target.name;
+  decrementRoleCountHandler(event, roleType) {
+    event.preventDefault();    
+    switch (roleType) {
+      case assassinTag:
+        if(this.state.assassin !== 0){     
+          this.state.assassin--;     
+          this.setState({assassin: this.state.assassin});
+        }
+        break;
+      case vigilanteTag:
+        if(this.state.vigilante !== 0){
+          this.state.vigilante--;
+          this.setState({vigilante: this.state.vigilante});
+        }
+        break;
+      case doctorTag:
+        if(this.state.doctor !== 0){
+          this.state.doctor--;
+          this.setState({doctor: this.state.doctor});
+        }
+        break;
+      case detectiveTag:
+        if(this.state.detective !== 0){
+          this.state.detective--;
+          this.setState({detective: this.state.detective});
+        }
+        break;
+      case jesterTag:
+        if(this.state.jester !== 0){
+          this.state.jester--;
+          this.setState({jester: this.state.jester});
+        }
+        break;
+    }
+  }
 
-  this.setState({
-    [name]: value
-  });
-}
+  incrementRoleCountHandler(event, roleType) {
+    event.preventDefault();
+    switch (roleType) {
+      case assassinTag:
+        this.state.assassin++;
+        this.setState({assassin: this.state.assassin});        
+        break;
+      case vigilanteTag:
+        this.state.vigilante++;
+        this.setState({vigilante: this.state.vigilante});
+        break;
+      case doctorTag:
+        this.state.doctor++;
+        this.setState({doctor: this.state.doctor});
+        break;
+      case detectiveTag:
+        this.state.detective++;
+        this.setState({detective: this.state.detective});
+        break;
+      case jesterTag:
+        this.state.jester++;
+        this.setState({jester: this.state.jester});
+        break;
+    }
+  }
 
   render() {
-      socket.on(this.state.lobbyId.number, function(msg) {
-        if (msg.userId !== undefined && !this.state.users.includes(msg.userId) && localUser !== '') {
-          this.addUsers(msg.userId);
-        }
-      }.bind(this));
+    socket.on(this.state.lobbyId.number, function(msg) {
+      if (msg.userId !== undefined && !this.state.users.includes(msg.userId) && localUser !== '') {
+        this.addUsers(msg.userId);
+      }
+    }.bind(this));
 
-      socket.on('startGameConf', function(msg) {
-        var assignedRoles = new HashMap(msg);
-        this.decidePage(assignedRoles);
-      }.bind(this));
+    socket.on('startGameConf', function(msg) {
+      var assignedRoles = new HashMap(msg);
+      this.decidePage(assignedRoles);
+    }.bind(this));
 
-      socket.on('errorMessage', function(msg) {
-        this.setState({
-          errorMessage: msg.errorMessage
-        });
-      }.bind(this));
+    socket.on('errorMessage', function(msg) {
+      this.setState({
+        errorMessage: msg.errorMessage
+      });
+    }.bind(this));
 
-      socket.on('checkLobby', function(msg) {
-        if (!localUser || msg.valid === 'false') {
-          this.props.history.push('/');
-        }
-      }.bind(this));
+    socket.on('checkLobby', function(msg) {
+      if (!localUser || msg.valid === 'false') {
+        this.props.history.push('/');
+      }
+    }.bind(this));
 
     return (
       <div ref="joinGame" className="App">
@@ -123,42 +182,34 @@ export class joinGameID extends Component {
         })}
         </ul>
         <h3>Role Picker</h3>
-        <form id="form5" onSubmit={this.handleSubmit} onChange={this.handleChange}>
-        <label>
-          Vigilante:
-          <input
-            name="vigilante"
-            type="checkbox"
-            checked={this.state.isGoing}
-            onChange={this.handleInputChange} />
-        </label>
-        <label>
-          Doctor:
-          <input
-            name="doctor"
-            type="checkbox"
-            checked={this.state.isGoing}
-            onChange={this.handleInputChange} />
-        </label>
-        <label>
-          Detective:
-          <input
-            name="detective"
-            type="checkbox"
-            checked={this.state.isGoing}
-            onChange={this.handleInputChange} />
-        </label>
-        <label>
-          Jester:
-          <input
-            name="jester"
-            type="checkbox"
-            checked={this.state.isGoing}
-            onChange={this.handleInputChange} />
-        </label>
-        <input className='textBox' id="assassin" name='assassin' value={this.state.assassin} placeholder="Enter Number of Assassin(s)"/>
-
+        
+        <form name="rolePicker">
+          <h4>Assassin</h4>
+          <button className='decrementBtn' onClick={ (e) => this.decrementRoleCountHandler(e,assassinTag)}>-</button>
+          <input value={this.state.assassin} readOnly="true"/>
+          <button className='incrementBtn' onClick={ (e) => this.incrementRoleCountHandler(e,assassinTag)}>+</button>
+        
+          <h4>Vigilante</h4>
+          <button className='decrementBtn' onClick={ (e) => this.decrementRoleCountHandler(e,vigilanteTag)}>-</button>
+          <input value={this.state.vigilante} readOnly="true"/>
+          <button className='incrementBtn' onClick={ (e) => this.incrementRoleCountHandler(e,vigilanteTag)}>+</button>
+        
+          <h4>Doctor</h4>
+          <button className='decrementBtn' onClick={ (e) => this.decrementRoleCountHandler(e,doctorTag)}>-</button>
+          <input value={this.state.doctor} readOnly="true"/>
+          <button className='incrementBtn' onClick={ (e) => this.incrementRoleCountHandler(e,doctorTag)}>+</button>
+        
+          <h4>Detective</h4>
+          <button className='decrementBtn' onClick={ (e) => this.decrementRoleCountHandler(e,detectiveTag)}>-</button>
+          <input value={this.state.detective} readOnly="true"/>
+          <button className='incrementBtn' onClick={ (e) => this.incrementRoleCountHandler(e,detectiveTag)}>+</button>
+        
+          <h4>Jester</h4>
+          <button className='decrementBtn' onClick={ (e) => this.decrementRoleCountHandler(e,jesterTag)}>-</button>
+          <input value={this.state.jester} readOnly="true"/>
+          <button className='incrementBtn' onClick={ (e) => this.incrementRoleCountHandler(e,jesterTag)}>+</button>
         </form>
+              
         <button className='buttonPlay' onClick={this.startGame}>Start Game</button>
         <button className='buttonLeave' onClick={this.leaveLobby}>Leave Game</button>
         <div className='errorMessage'>{this.state.errorMessage}</div>
@@ -168,7 +219,6 @@ export class joinGameID extends Component {
     );
   }
 }
-
 
 function setLocalUser(username) {
   localUser = username;
