@@ -58,10 +58,39 @@ export class joinGameID extends Component {
     }
   }
 
+  startGame() {
+ 
+    if (this.state.users.length >= 2) {            
+      var checkCountFlag = this.checkRoleCount();      
+      if(checkCountFlag){
 
-  // BUILD A HASHMAP HERE WITH ALL VALS. CHECK TO SEE IF THE NUMBER ARE LESS THE THE NUMBER OF PEOPLE IN THE LOBBY. SEND IT TO BACK
-  // END AND DECIDE ROLES THERE. TO DECIDE THE ROLES. ITERATE THROUGH EACH HASHMAP KEY AND RUN A LOOP BASED ON THE AMOUNT FOR EACH KEY AND ASSIGN
-  // ROLES, POP PEOPLE OUT OF RANDOM PEOPLE ARRAY AND REUSE SOME OF THE LOGIC TO CREATE HASMAP TO SEND BACK.
+        var roleCountMap = this.collectRoleCount();
+
+        sendStartGameRequest(this.state.lobbyId.number, roleCountMap);
+      } else {
+        this.setState({errorMessage: "Improper role count"});
+      }      
+    } else {
+      this.setState({errorMessage: "Must have a minimum of 5 Players to Start"});
+    }
+  }
+  
+  leaveLobby() {
+    sendLeaveLobbyRequest(this.state.lobbyId.number);
+    localUser = '';
+    socket.on('leaveLobby', function(msg) {
+      this.props.history.push('/');
+    }.bind(this));
+  }
+
+  decidePage(assignedRoles) {
+    rolesRegistry = assignedRoles;
+    if (assignedRoles.get(localUser) !== "moderator") {
+      this.props.history.push('/game');
+    } else {
+      this.props.history.push('/moderator');
+    }
+  }
 
   collectRoleCount(){
     var countMap = new HashMap();
@@ -84,37 +113,29 @@ export class joinGameID extends Component {
     }
   }
 
-  startGame() {
- 
-    if (this.state.users.length >= 2) {            
-      var checkCountFlag = this.checkRoleCount();      
-      if(checkCountFlag){
-        
-        var roleCountMap = this.collectRoleCount();
-
-        sendStartGameRequest(this.state.lobbyId.number, roleCountMap);
-      } else {
-        this.setState({errorMessage: "Improper role count"});
-      }      
-    } else {
-      this.setState({errorMessage: "Must have a minimum of 5 Players to Start"});
-    }
-  }
-
-  leaveLobby() {
-    sendLeaveLobbyRequest(this.state.lobbyId.number);
-    localUser = '';
-    socket.on('leaveLobby', function(msg) {
-      this.props.history.push('/');
-    }.bind(this));
-  }
-
-  decidePage(assignedRoles) {
-    rolesRegistry = assignedRoles;
-    if (assignedRoles.get(localUser) !== "moderator") {
-      this.props.history.push('/game');
-    } else {
-      this.props.history.push('/moderator');
+  incrementRoleCountHandler(event, roleType) {
+    event.preventDefault();
+    switch (roleType) {
+      case assassinTag:
+        this.state.assassin++;
+        this.setState({assassin: this.state.assassin});        
+        break;
+      case vigilanteTag:
+        this.state.vigilante++;
+        this.setState({vigilante: this.state.vigilante});
+        break;
+      case doctorTag:
+        this.state.doctor++;
+        this.setState({doctor: this.state.doctor});
+        break;
+      case detectiveTag:
+        this.state.detective++;
+        this.setState({detective: this.state.detective});
+        break;
+      case jesterTag:
+        this.state.jester++;
+        this.setState({jester: this.state.jester});
+        break;
     }
   }
 
@@ -153,33 +174,7 @@ export class joinGameID extends Component {
         break;
     }
   }
-
-  incrementRoleCountHandler(event, roleType) {
-    event.preventDefault();
-    switch (roleType) {
-      case assassinTag:
-        this.state.assassin++;
-        this.setState({assassin: this.state.assassin});        
-        break;
-      case vigilanteTag:
-        this.state.vigilante++;
-        this.setState({vigilante: this.state.vigilante});
-        break;
-      case doctorTag:
-        this.state.doctor++;
-        this.setState({doctor: this.state.doctor});
-        break;
-      case detectiveTag:
-        this.state.detective++;
-        this.setState({detective: this.state.detective});
-        break;
-      case jesterTag:
-        this.state.jester++;
-        this.setState({jester: this.state.jester});
-        break;
-    }
-  }
-
+  
   render() {
     socket.on(this.state.lobbyId.number, function(msg) {
       if (msg.userId !== undefined && !this.state.users.includes(msg.userId) && localUser !== '') {

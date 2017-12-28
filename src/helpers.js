@@ -4,6 +4,22 @@ var towneeTag = "townee";
 var moderatorTag = "moderator";
 
 module.exports = {
+  
+  assignmoderator: function(clientMap, socket) {
+    var delegatedRoles = new HashMap();
+    delegatedRoles.set(clientMap.get(socket), moderatorTag);
+    clientMap.remove(socket); //removing this client from hashmap as their role has been assigned as moderator
+    return delegatedRoles;
+  },
+
+  generateLobbyId: function(lobbyReg) {
+    var lobbyId;
+    do {
+      lobbyId = Math.random().toString(36).substr(2, 5);
+    }
+    while (lobbyReg.has(lobbyId));
+    return lobbyId;
+  },
 
   delegate: function(clientMap, delegatedRoles, roleCountMap) {
     var clientIds = [];
@@ -36,22 +52,5 @@ module.exports = {
     }
 
     return delegatedRoles;
-  },
-
-  assignmoderator: function(clientMap, socket) {
-    var delegatedRoles = new HashMap();
-    delegatedRoles.set(clientMap.get(socket), moderatorTag);
-    clientMap.remove(socket); //removing this client from hashmap as their role has been assigned as moderator
-    return delegatedRoles;
-  },
-
-  generateLobbyId: function(lobbyReg) {
-    var lobbyId;
-    do {
-      lobbyId = Math.random().toString(36).substr(2, 5);
-    }
-    while (lobbyReg.has(lobbyId));
-    return lobbyId;
   }
-
 };
