@@ -6,7 +6,7 @@ const io = require('socket.io')();
 
 
 var HashMap = require('hashmap');
-var helpers = require('./src/helpers.js');
+var helper = require('./src/backend/helper.js');
 
 var lobbyReg = new HashMap();
 
@@ -35,7 +35,7 @@ io.on('connection', function(socket) {
 
   socket.on('newGame', function(name) {
     console.log("Server has recieved a new game request");
-    var lobbyId = helpers.generateLobbyId(lobbyReg);
+    var lobbyId = helper.generateLobbyId(lobbyReg);
     var clientMap = new HashMap();
     clientMap.set(socket.id, name);
     lobbyReg.set(lobbyId, clientMap);
@@ -119,8 +119,8 @@ io.on('connection', function(socket) {
     console.log("test count: " + roleCountMap.get("assassin"));
 
     if (clientMap.size >= 2) {
-      var delegatedRoles = helpers.assignmoderator(clientMap, socket.id);
-      delegatedRoles = helpers.delegate(clientMap, delegatedRoles, roleCountMap);
+      var delegatedRoles = helper.assignmoderator(clientMap, socket.id);
+      delegatedRoles = helper.delegate(clientMap, delegatedRoles, roleCountMap);
       lobbyReg.get(lobbyId).forEach(function(value, key) {
         io.to(key).emit('startGameConf', delegatedRoles);
       });
