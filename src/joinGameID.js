@@ -31,6 +31,8 @@ export class joinGameID extends Component {
     this.handleChange = this.handleChange.bind(this);
     this.decrementRoleCountHandler = this.decrementRoleCountHandler.bind(this);
     this.incrementRoleCountHandler = this.incrementRoleCountHandler.bind(this);
+    this.collectRoleCount = this.collectRoleCount.bind(this);
+    this.checkRoleCount = this.checkRoleCount.bind(this);
     checkValidLobby(this.state.lobbyId.number);
   }
 
@@ -56,13 +58,49 @@ export class joinGameID extends Component {
     }
   }
 
-  startGame() {
-    if (this.state.users.length >= 2) {
-      sendStartGameRequest(this.state.lobbyId.number);
+
+  // BUILD A HASHMAP HERE WITH ALL VALS. CHECK TO SEE IF THE NUMBER ARE LESS THE THE NUMBER OF PEOPLE IN THE LOBBY. SEND IT TO BACK
+  // END AND DECIDE ROLES THERE. TO DECIDE THE ROLES. ITERATE THROUGH EACH HASHMAP KEY AND RUN A LOOP BASED ON THE AMOUNT FOR EACH KEY AND ASSIGN
+  // ROLES, POP PEOPLE OUT OF RANDOM PEOPLE ARRAY AND REUSE SOME OF THE LOGIC TO CREATE HASMAP TO SEND BACK.
+
+  collectRoleCount(){
+    var countMap = new HashMap();
+    countMap.set(assassinTag, this.state.assassin);
+    countMap.set(vigilanteTag, this.state.vigilante);
+    countMap.set(doctorTag, this.state.doctor);
+    countMap.set(jesterTag, this.state.jester);
+    countMap.set(detectiveTag, this.state.detective);
+    console.log("map ready" + countMap);
+    return countMap;
+  }
+
+  checkRoleCount(){
+    var sum = this.state.assassin + this.state.vigilante + this.state.doctor + this.state.jester + this.state.detective;
+    console.log("role sums: " + sum);
+    if(sum <= this.state.users.length && this.state.assassin > 0){
+      console.log("passed sum check");
+      return true;
     } else {
-      this.setState({
-        errorMessage: "Must have a minimum of 5 Players to Start"
-      })
+      return false;
+    }
+  }
+
+  startGame() {
+ 
+    if (this.state.users.length >= 2) {
+            
+      var checkCountFlag = this.checkRoleCount(); 
+      
+      if(checkCountFlag){
+        var roleCountMap = new HashMap();
+        roleCountMap = this.collectRoleCount();
+        console.log("sending out request soon.");
+        sendStartGameRequest(this.state.lobbyId.number, roleCountMap);
+      } else {
+        this.setState({errorMessage: "Improper role count"});
+      }      
+    } else {
+      this.setState({errorMessage: "Must have a minimum of 5 Players to Start"});
     }
   }
 
