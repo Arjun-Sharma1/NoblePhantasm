@@ -1,5 +1,8 @@
-import io from 'socket.io-client';
-var socket = io();
+// import io from 'socket.io-client';
+// var socket = io();
+import openSocket from 'socket.io-client';
+var socket = openSocket('http://localhost:8000');
+var HashMap = require('hashmap');
 
 function sendNewGameRequest(name) {
   socket.emit("newGame", name);
@@ -13,8 +16,8 @@ function sendLeaveLobbyRequest(lobbyId) {
   socket.emit("leaveLobby", lobbyId);
 }
 
-function sendStartGameRequest(lobbyId) {
-  socket.emit("startGame", lobbyId);
+function sendStartGameRequest(lobbyId, roleCountMap) {  
+  socket.emit("startGame", lobbyId, roleCountMap);
 }
 
 function checkValidLobby(lobbyId) {
