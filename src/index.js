@@ -1,18 +1,18 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { BrowserRouter, Switch, Route } from 'react-router-dom'
-import App from './App';
-import {joinGame} from './joinGame.js';
-import {newGameCreate} from './newGame.js';
-import {game} from './game.js';
-import {moderator} from './moderator.js';
-import {joinGameID} from './joinGameID.js';
+import app from './frontend/app';
+import {joinGame} from './frontend/joinGame.js';
+import {newGameCreate} from './frontend/newGame.js';
+import {game} from './frontend/game.js';
+import {moderator} from './frontend/moderator.js';
+import {joinGameID} from './frontend/joinGameID.js';
 
 ReactDOM.render((
   <BrowserRouter>
     <div>
       <Switch>
-        <Route exact path='/' component={App}/>
+        <Route exact path='/' component={app}/>
         <Route exact path='/joinGame' component={joinGame}/>
         <Route exact path='/joinGame/:number' component={joinGameID}/>
         <Route exact path='/newGame' component={newGameCreate}/>
