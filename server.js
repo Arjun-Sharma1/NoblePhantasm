@@ -109,14 +109,18 @@ io.on('connection', function(socket) {
     }
   });
 
-  socket.on('startGame', function(lobbyId) {
+  socket.on('startGame', function(lobbyId, countMap) {
 
     console.log("Start game request recieved for " + lobbyId + ", delegating roles...");
     var originalMap = lobbyReg.get(lobbyId);
     var clientMap = new HashMap(originalMap);
+    var roleCountMap = new HashMap(countMap);
+
+    console.log("test count: " + roleCountMap.get("assassin"));
+
     if (clientMap.size >= 2) {
       var delegatedRoles = helpers.assignmoderator(clientMap, socket.id);
-      delegatedRoles = helpers.delegate(clientMap, delegatedRoles);
+      delegatedRoles = helpers.delegate(clientMap, delegatedRoles, roleCountMap);
       lobbyReg.get(lobbyId).forEach(function(value, key) {
         io.to(key).emit('startGameConf', delegatedRoles);
       });

@@ -70,15 +70,14 @@ export class joinGameID extends Component {
     countMap.set(doctorTag, this.state.doctor);
     countMap.set(jesterTag, this.state.jester);
     countMap.set(detectiveTag, this.state.detective);
-    console.log("map ready" + countMap);
     return countMap;
   }
 
   checkRoleCount(){
+
     var sum = this.state.assassin + this.state.vigilante + this.state.doctor + this.state.jester + this.state.detective;
-    console.log("role sums: " + sum);
+    
     if(sum <= this.state.users.length && this.state.assassin > 0){
-      console.log("passed sum check");
       return true;
     } else {
       return false;
@@ -87,14 +86,12 @@ export class joinGameID extends Component {
 
   startGame() {
  
-    if (this.state.users.length >= 2) {
-            
-      var checkCountFlag = this.checkRoleCount(); 
-      
+    if (this.state.users.length >= 2) {            
+      var checkCountFlag = this.checkRoleCount();      
       if(checkCountFlag){
-        var roleCountMap = new HashMap();
-        roleCountMap = this.collectRoleCount();
-        console.log("sending out request soon.");
+        
+        var roleCountMap = this.collectRoleCount();
+
         sendStartGameRequest(this.state.lobbyId.number, roleCountMap);
       } else {
         this.setState({errorMessage: "Improper role count"});

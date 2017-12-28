@@ -16,9 +16,7 @@ function sendLeaveLobbyRequest(lobbyId) {
   socket.emit("leaveLobby", lobbyId);
 }
 
-function sendStartGameRequest(lobbyId, roleCountMap) {
-  var map = new HashMap();
-  map = roleCountMap;
+function sendStartGameRequest(lobbyId, roleCountMap) {  
   socket.emit("startGame", lobbyId, roleCountMap);
 }
 

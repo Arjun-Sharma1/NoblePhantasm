@@ -2,7 +2,7 @@ var HashMap = require('hashmap');
 
 module.exports = {
 
-  delegate: function(clientMap, delegatedRoles) {
+  delegate: function(clientMap, delegatedRoles, roleCountMap) {
     var clientIds = [];
 
     clientMap.forEach(function(value, key) {
