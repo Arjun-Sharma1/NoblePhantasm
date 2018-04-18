@@ -1,5 +1,8 @@
 # NoblePhantasm
 
+## Play it now!
+http://noble-phantasm.herokuapp.com/
+
 ## Instructions for Heroku Deployment
 1) Create heroku account and loging using `heroku login`
 2) Run command `heroku app create`
@@ -23,4 +26,4 @@ Roles include:
   - More coming soon!
   
 Game Rules:
-  ...
+  https://en.wikipedia.org/wiki/Mafia_(party_game)
