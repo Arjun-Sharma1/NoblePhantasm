@@ -1,7 +1,9 @@
 # NoblePhantasm
 
 ## Play it now!
-http://noble-phantasm.herokuapp.com/
+http://noble-phantasm.herokuapp.com/ <br>
+`Note that players do not need to create an account to play. Online play is handled by a lobby
+feature which allows players to quickly create, invite and play games with friends.`
 
 ## Instructions for Heroku Deployment
 1) Create heroku account and loging using `heroku login`
