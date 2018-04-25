@@ -10,10 +10,6 @@
     }
 }
 
-.App{
-  text-align: center;
-}
-
 .button_base {
     margin: 0 auto;
     border: 0;
@@ -129,4 +125,20 @@
 .buttonLeave:hover {
   background: red !important;
   cursor:'pointer';
+}
+
+.decrementBtn:hover{
+  background: rgba(0,0,0,0.3);
+}
+
+.decrementBtn:active{
+  background: rgba(0,0,0,0.5);
+}
+
+.incrementBtn:hover{
+  background: rgba(0,0,0,0.3);
+}
+
+.incrementBtn:active{
+  background: rgba(0,0,0,0.5);
 }
