@@ -1,7 +1,7 @@
-import io from 'socket.io-client';
-var socket = io();
-// import openSocket from 'socket.io-client';
-// var socket = openSocket('http://localhost:8000');
+// import io from 'socket.io-client';
+// var socket = io();
+import openSocket from 'socket.io-client';
+var socket = openSocket('http://localhost:8000');
 
 function sendNewGameRequest(name) {
   socket.emit("newGame", name);

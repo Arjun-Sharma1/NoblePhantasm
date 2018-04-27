@@ -69,6 +69,7 @@ export class joinGameID extends Component {
       var checkCountFlag = this.checkRoleCount();
       if(checkCountFlag){
         var roleCountMap = this.collectRoleCount();
+        this.setState({errorMessage: ''});
         sendStartGameRequest(this.state.lobbyId.number, roleCountMap);
       }
     } else {
@@ -82,6 +83,7 @@ export class joinGameID extends Component {
 
   leaveLobby() {
     sendLeaveLobbyRequest(this.state.lobbyId.number);
+    this.setState({errorMessage: ''});
     localUser = '';
     socket.on('leaveLobby', function(msg) {
       this.props.history.push('/');
@@ -123,79 +125,21 @@ export class joinGameID extends Component {
     }
   }
 
-  incrementRoleCountHandler(event, roleType) {
+  incrementRoleCountHandler(event, roleType, roleCount) {
     event.preventDefault();
-    switch (roleType) {
-      case assassinTag:
-        this.setState((state)=>(
-          {assassin: this.state.assassin+1}
-        ))
-        break;
-      case vigilanteTag:
-        this.setState((state)=>(
-          {vigilante: this.state.vigilante+1}
-        ))
-        break;
-      case doctorTag:
-        this.setState((state)=>(
-          {doctor: this.state.doctor+1}
-        ))
-        break;
-      case detectiveTag:
-        this.setState((state)=>(
-          {detective: this.state.detective+1}
-        ))
-        break;
-      case jesterTag:
-        this.setState((state)=>(
-          {jester: this.state.jester+1}
-        ))
-        break;
-      default:
-        break;
+    if(roleCount+1 >= 0){
+      var newState = {};
+      newState[roleType] = roleCount+1;
+      this.setState(newState);
     }
   }
 
-  decrementRoleCountHandler(event, roleType) {
+  decrementRoleCountHandler(event, roleType, roleCount) {
     event.preventDefault();
-    switch (roleType) {
-      case assassinTag:
-        if(this.state.assassin !== 0){
-          this.setState((state)=>(
-            {assassin: this.state.assassin-1}
-          ))
-        }
-        break;
-      case vigilanteTag:
-        if(this.state.vigilante !== 0){
-          this.setState((state)=>(
-            {vigilante: this.state.vigilante-1}
-          ))
-        }
-        break;
-      case doctorTag:
-        if(this.state.doctor !== 0){
-          this.setState((state)=>(
-            {doctor: this.state.doctor-1}
-          ))
-        }
-        break;
-      case detectiveTag:
-        if(this.state.detective !== 0){
-          this.setState((state)=>(
-            {detective: this.state.detective-1}
-          ))
-        }
-        break;
-      case jesterTag:
-        if(this.state.jester !== 0){
-          this.setState((state)=>(
-            {jester: this.state.jester-1}
-          ))
-        }
-        break;
-      default:
-        break;
+    if(roleCount-1 >= 0){
+      var newState = {};
+      newState[roleType] = roleCount-1;
+      this.setState(newState);
     }
   }
 
@@ -225,25 +169,25 @@ export class joinGameID extends Component {
                 <h3>Role Picker</h3>
                 <form className="rolePicker" id="rolePicker" name="rolePicker">
                   <h4>Assassin</h4>
-                  <button className='decrementBtn' onClick={ (e) => this.decrementRoleCountHandler(e,assassinTag)}>-</button>
+                  <button className='decrementBtn' onClick={ (e) => this.decrementRoleCountHandler(e,assassinTag, this.state.assassin)}>-</button>
                   <input value={this.state.assassin} readOnly="true"/>
-                  <button className='incrementBtn' onClick={ (e) => this.incrementRoleCountHandler(e,assassinTag)}>+</button>
+                  <button className='incrementBtn' onClick={ (e) => this.incrementRoleCountHandler(e,assassinTag, this.state.assassin)}>+</button>
                   <h4>Vigilante</h4>
-                  <button className='decrementBtn' onClick={ (e) => this.decrementRoleCountHandler(e,vigilanteTag)}>-</button>
+                  <button className='decrementBtn' onClick={ (e) => this.decrementRoleCountHandler(e,vigilanteTag, this.state.vigilante)}>-</button>
                   <input value={this.state.vigilante} readOnly="true"/>
-                  <button className='incrementBtn' onClick={ (e) => this.incrementRoleCountHandler(e,vigilanteTag)}>+</button>
+                  <button className='incrementBtn' onClick={ (e) => this.incrementRoleCountHandler(e,vigilanteTag, this.state.vigilante)}>+</button>
                   <h4>Doctor</h4>
-                  <button className='decrementBtn' onClick={ (e) => this.decrementRoleCountHandler(e,doctorTag)}>-</button>
+                  <button className='decrementBtn' onClick={ (e) => this.decrementRoleCountHandler(e,doctorTag, this.state.doctor)}>-</button>
                   <input value={this.state.doctor} readOnly="true"/>
-                  <button className='incrementBtn' onClick={ (e) => this.incrementRoleCountHandler(e,doctorTag)}>+</button>
+                  <button className='incrementBtn' onClick={ (e) => this.incrementRoleCountHandler(e,doctorTag, this.state.doctor)}>+</button>
                   <h4>Detective</h4>
-                  <button className='decrementBtn' onClick={ (e) => this.decrementRoleCountHandler(e,detectiveTag)}>-</button>
+                  <button className='decrementBtn' onClick={ (e) => this.decrementRoleCountHandler(e,detectiveTag, this.state.detective)}>-</button>
                   <input value={this.state.detective} readOnly="true"/>
-                  <button className='incrementBtn' onClick={ (e) => this.incrementRoleCountHandler(e,detectiveTag)}>+</button>
+                  <button className='incrementBtn' onClick={ (e) => this.incrementRoleCountHandler(e,detectiveTag, this.state.detective)}>+</button>
                   <h4>Jester</h4>
-                  <button className='decrementBtn' onClick={ (e) => this.decrementRoleCountHandler(e,jesterTag)}>-</button>
+                  <button className='decrementBtn' onClick={ (e) => this.decrementRoleCountHandler(e,jesterTag, this.state.jester)}>-</button>
                   <input value={this.state.jester} readOnly="true"/>
-                  <button className='incrementBtn' onClick={ (e) => this.incrementRoleCountHandler(e,jesterTag)}>+</button>
+                  <button className='incrementBtn' onClick={ (e) => this.incrementRoleCountHandler(e,jesterTag, this.state.jester)}>+</button>
                 </form>
                 <button className='buttonPlay' onClick={this.startGame}>Start Game</button>
                 <button className='buttonLeave' onClick={this.leaveLobby}>Leave Game</button>
