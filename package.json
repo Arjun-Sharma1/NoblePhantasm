@@ -25,7 +25,7 @@
     "url": "https://github.com/aarb1/NoblePhantasm/issues"
   },
   "scripts": {
-    "start": "react-scripts start | node server.js",
+    "start": "node server.js",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject"
