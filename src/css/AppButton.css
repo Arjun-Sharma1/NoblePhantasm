@@ -93,28 +93,30 @@
     background-color: #4CAF50; /* Green */
     border: none;
     color: white;
-    margin: 5px;
+    margin: 10px;
+    margin-right: 10px;
     padding: 5px 15px;
-    height:30px;
-    width:120px;
+    height:40px;
+    width:140px;
     text-align: center;
     text-decoration: none;
     display: inline-block;
-    font-size: 23px;
+    font-size: 28px;
 }
 
 .buttonLeave {
     background-color: #f44336; /* Red */
     border: none;
     color: white;
-    margin: 5px;
+    margin: 10px;
+    margin-left: 10px;
     padding: 5px 15px;
-    height:30px;
-    width:120px;
+    height:40px;
+    width:140px;
     text-align: center;
     text-decoration: none;
     display: inline-block;
-    font-size: 23px;
+    font-size: 28px;
 }
 
 .buttonPlay:hover {

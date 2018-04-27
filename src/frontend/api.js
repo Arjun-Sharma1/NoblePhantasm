@@ -19,6 +19,10 @@ function sendStartGameRequest(lobbyId, roleCountMap) {
   socket.emit("startGame", lobbyId, roleCountMap);
 }
 
+function sendRestartGameRequest(name) {
+  socket.emit("resetGame", name);
+}
+
 function checkValidLobby(lobbyId) {
   socket.emit("checkLobby", lobbyId);
 }
@@ -28,6 +32,7 @@ export {
   sendLeaveLobbyRequest,
   sendJoinGameRequest,
   sendStartGameRequest,
+  sendRestartGameRequest,
   checkValidLobby,
   socket
 };

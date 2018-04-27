@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { sendLeaveLobbyRequest, sendStartGameRequest, socket, checkValidLobby } from './api';
+import { sendLeaveLobbyRequest, sendStartGameRequest, sendRestartGameRequest, socket, checkValidLobby } from './api';
 var HashMap = require('hashmap');
 var localUser = "";
 var assassinTag = "assassin";
@@ -7,8 +7,7 @@ var vigilanteTag = "vigilante";
 var doctorTag = "doctor";
 var detectiveTag = "detective";
 var jesterTag = "jester";
-var rolesRegistry;
-
+var roles;
 
 export class joinGameID extends Component {
   constructor(props) {
@@ -16,13 +15,18 @@ export class joinGameID extends Component {
     this.state = {
       lobbyId: props.match.params,
       users: [],
+      gameRenderState:0,
       errorMessage: '',
       vigilante:0,
       doctor:0,
       jester:0,
       detective:0,
-      assassin:0
+      assassin:1,
+      username: localUser,
+      userRole: ''
     };
+
+    checkValidLobby(this.state.lobbyId.number);
 
     this.startGame = this.startGame.bind(this);
     this.leaveLobby = this.leaveLobby.bind(this);
@@ -33,7 +37,10 @@ export class joinGameID extends Component {
     this.incrementRoleCountHandler = this.incrementRoleCountHandler.bind(this);
     this.collectRoleCount = this.collectRoleCount.bind(this);
     this.checkRoleCount = this.checkRoleCount.bind(this);
-    checkValidLobby(this.state.lobbyId.number);
+    this.gameRender = this.gameRender.bind(this);
+    this.extractRoles = this.extractRoles.bind(this);
+    this.resetGame = this.resetGame.bind(this);
+
   }
 
   handleChange(event) {
@@ -51,28 +58,26 @@ export class joinGameID extends Component {
       return true;
     })
     //Check if component is fully mounted before setting state
-    if (this.refs.joinGame) {
-      this.setState({
-        users: holder
-      });
-    }
+    while (!this.refs.joinGame) {
+      console.log("Waiting for component to mount")
+    };
+    this.setState({users: holder});
   }
 
   startGame() {
-
     if (this.state.users.length >= 2) {
       var checkCountFlag = this.checkRoleCount();
       if(checkCountFlag){
-
         var roleCountMap = this.collectRoleCount();
-
         sendStartGameRequest(this.state.lobbyId.number, roleCountMap);
-      } else {
-        this.setState({errorMessage: "Improper role count"});
       }
     } else {
       this.setState({errorMessage: "Must have a minimum of 5 Players to Start"});
     }
+  }
+
+  resetGame(){
+    sendRestartGameRequest(this.state.lobbyId.number);
   }
 
   leaveLobby() {
@@ -84,11 +89,12 @@ export class joinGameID extends Component {
   }
 
   decidePage(assignedRoles) {
-    rolesRegistry = assignedRoles;
-    if (assignedRoles.get(localUser) !== "moderator") {
-      this.props.history.push('/game');
+    roles = new HashMap(assignedRoles);
+    this.setState({userRole: roles.get(localUser)});
+    if (assignedRoles.get(localUser) === "moderator") {
+      this.setState({gameRenderState:1});
     } else {
-      this.props.history.push('/moderator');
+      this.setState({gameRenderState:2});
     }
   }
 
@@ -103,12 +109,16 @@ export class joinGameID extends Component {
   }
 
   checkRoleCount(){
-
-    var sum = this.state.assassin + this.state.vigilante + this.state.doctor + this.state.jester + this.state.detective;
-
-    if(sum <= this.state.users.length && this.state.assassin > 0){
-      return true;
-    } else {
+    //Subtract 1 for moderator
+    var sum = this.state.assassin + this.state.vigilante + this.state.doctor + this.state.jester + this.state.detective+1;
+    if(sum <= this.state.users.length){
+      if(this.state.assassin > 0){
+        return true;
+      }else{
+        this.setState({errorMessage: "Must have minimum of 1 Assassin"});
+      }
+    }else {
+      this.setState({errorMessage: "Number of Roles exceeds Number of Players"});
       return false;
     }
   }
@@ -189,6 +199,86 @@ export class joinGameID extends Component {
     }
   }
 
+  extractRoles(){
+      var temp = [];
+      roles.forEach(function(value, key) {
+          temp.push(key + ': ' + value);
+      });
+      return temp;
+   }
+
+  gameRender(){
+    if(this.state.gameRenderState === 0){
+        return(
+          <div ref="joinGame">
+            <header className="App-header">
+                  <h6 className="App-title">Waiting for Players...</h6>
+                  <h2>Lobby Code: {this.state.lobbyId.number}</h2>
+                </header>
+                <hr width="35%"></hr>
+                <ul>
+                {this.state.users.map(function(listValue,index) {
+                  return <li key={index}><a href="#">{listValue}</a></li>;
+                })}
+                </ul>
+                <hr width="35%"></hr>
+                <h3>Role Picker</h3>
+                <form className="rolePicker" id="rolePicker" name="rolePicker">
+                  <h4>Assassin</h4>
+                  <button className='decrementBtn' onClick={ (e) => this.decrementRoleCountHandler(e,assassinTag)}>-</button>
+                  <input value={this.state.assassin} readOnly="true"/>
+                  <button className='incrementBtn' onClick={ (e) => this.incrementRoleCountHandler(e,assassinTag)}>+</button>
+                  <h4>Vigilante</h4>
+                  <button className='decrementBtn' onClick={ (e) => this.decrementRoleCountHandler(e,vigilanteTag)}>-</button>
+                  <input value={this.state.vigilante} readOnly="true"/>
+                  <button className='incrementBtn' onClick={ (e) => this.incrementRoleCountHandler(e,vigilanteTag)}>+</button>
+                  <h4>Doctor</h4>
+                  <button className='decrementBtn' onClick={ (e) => this.decrementRoleCountHandler(e,doctorTag)}>-</button>
+                  <input value={this.state.doctor} readOnly="true"/>
+                  <button className='incrementBtn' onClick={ (e) => this.incrementRoleCountHandler(e,doctorTag)}>+</button>
+                  <h4>Detective</h4>
+                  <button className='decrementBtn' onClick={ (e) => this.decrementRoleCountHandler(e,detectiveTag)}>-</button>
+                  <input value={this.state.detective} readOnly="true"/>
+                  <button className='incrementBtn' onClick={ (e) => this.incrementRoleCountHandler(e,detectiveTag)}>+</button>
+                  <h4>Jester</h4>
+                  <button className='decrementBtn' onClick={ (e) => this.decrementRoleCountHandler(e,jesterTag)}>-</button>
+                  <input value={this.state.jester} readOnly="true"/>
+                  <button className='incrementBtn' onClick={ (e) => this.incrementRoleCountHandler(e,jesterTag)}>+</button>
+                </form>
+                <button className='buttonPlay' onClick={this.startGame}>Start Game</button>
+                <button className='buttonLeave' onClick={this.leaveLobby}>Leave Game</button>
+                <div className='errorMessage'>{this.state.errorMessage}</div>
+            </div>
+              )
+        }else if(this.state.gameRenderState === 1){
+          this.extractRoles();
+          return(
+            <div ref="moderator" className="App">
+                <div>
+                    <h1>{this.state.username}</h1>
+                    <h3>You are the {this.state.userRole}!</h3>
+                    <p>Power Used || Dead</p>
+                    <ul>
+                        {this.extractRoles().map(function(listValue,index) {
+                        return <li key={index}><input type="checkbox"/><input type="checkbox"/><a href="#"> {listValue}</a></li>;
+                        })}
+                    </ul>
+                </div>
+                <button className='buttonLeave' onClick={this.resetGame}>Back to Lobby</button>
+            </div>
+          )
+        }else if(this.state.gameRenderState === 2){
+          return(
+            <div ref="roles" className="App">
+              <div>
+                  <h1>{this.state.username}</h1>
+                  <h3>You have been assigned {this.state.userRole}!</h3>
+              </div>
+            </div>
+          )
+        }
+  }
+
   render() {
     socket.on(this.state.lobbyId.number, function(msg) {
       if (msg.userId !== undefined && !this.state.users.includes(msg.userId) && localUser !== '') {
@@ -199,6 +289,10 @@ export class joinGameID extends Component {
     socket.on('startGameConf', function(msg) {
       var assignedRoles = new HashMap(msg);
       this.decidePage(assignedRoles);
+    }.bind(this));
+
+    socket.on('resetGame', function(msg) {
+      this.setState({gameRenderState:0});
     }.bind(this));
 
     socket.on('errorMessage', function(msg) {
@@ -213,55 +307,10 @@ export class joinGameID extends Component {
       }
     }.bind(this));
 
+
     return (
-      <div ref="joinGame" className="App">
-        <header className="App-header">
-          <h6 className="App-title">Waiting for Players...</h6>
-          <h2>Lobby Code: {this.state.lobbyId.number}</h2>
-
-        </header>
-
-        <hr width="35%"></hr>
-        <ul>
-        {this.state.users.map(function(listValue,index) {
-          return <li key={index}><a href="#">{listValue}</a></li>;
-        })}
-        </ul>
-        <hr width="35%"></hr>
-
-        <h3>Role Picker</h3>
-        <form className="rolePicker" id="rolePicker" name="rolePicker">
-          <h4>Assassin</h4>
-          <button className='decrementBtn' onClick={ (e) => this.decrementRoleCountHandler(e,assassinTag)}>-</button>
-          <input value={this.state.assassin} readOnly="true"/>
-          <button className='incrementBtn' onClick={ (e) => this.incrementRoleCountHandler(e,assassinTag)}>+</button>
-
-          <h4>Vigilante</h4>
-          <button className='decrementBtn' onClick={ (e) => this.decrementRoleCountHandler(e,vigilanteTag)}>-</button>
-          <input value={this.state.vigilante} readOnly="true"/>
-          <button className='incrementBtn' onClick={ (e) => this.incrementRoleCountHandler(e,vigilanteTag)}>+</button>
-
-          <h4>Doctor</h4>
-          <button className='decrementBtn' onClick={ (e) => this.decrementRoleCountHandler(e,doctorTag)}>-</button>
-          <input value={this.state.doctor} readOnly="true"/>
-          <button className='incrementBtn' onClick={ (e) => this.incrementRoleCountHandler(e,doctorTag)}>+</button>
-
-          <h4>Detective</h4>
-          <button className='decrementBtn' onClick={ (e) => this.decrementRoleCountHandler(e,detectiveTag)}>-</button>
-          <input value={this.state.detective} readOnly="true"/>
-          <button className='incrementBtn' onClick={ (e) => this.incrementRoleCountHandler(e,detectiveTag)}>+</button>
-
-          <h4>Jester</h4>
-          <button className='decrementBtn' onClick={ (e) => this.decrementRoleCountHandler(e,jesterTag)}>-</button>
-          <input value={this.state.jester} readOnly="true"/>
-          <button className='incrementBtn' onClick={ (e) => this.incrementRoleCountHandler(e,jesterTag)}>+</button>
-        </form>
-
-        <button className='buttonPlay' onClick={this.startGame}>Start Game</button>
-        <button className='buttonLeave' onClick={this.leaveLobby}>Leave Game</button>
-        <div className='errorMessage'>{this.state.errorMessage}</div>
-        <div>
-        </div>
+      <div className="App">
+        {this.gameRender()}
       </div>
     );
   }
@@ -271,4 +320,4 @@ function setLocalUser(username) {
   localUser = username;
 };
 
-export {setLocalUser, localUser, rolesRegistry};
+export {setLocalUser, localUser};

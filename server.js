@@ -79,6 +79,11 @@ io.on('connection', function(socket) {
 
   });
 
+  socket.on('resetGame', function(lobbyId){
+    console.log("Recieved Return to Lobby Request")
+    io.local.emit("resetGame");
+  });
+
   socket.on('leaveLobby', function(lobbyId) {
 
     if (lobbyReg.has(lobbyId)) {
