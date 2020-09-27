@@ -1,21 +1,26 @@
-import React from 'react';
+import React, { useState } from 'react';
 import ReactDOM from 'react-dom';
 import { BrowserRouter, Switch, Route } from 'react-router-dom'
 import app from './frontend/app';
-import {joinGame} from './frontend/joinGame.js';
-import {newGameCreate} from './frontend/newGame.js';
-import {joinGameID} from './frontend/joinGameID.js';
+import JoinGame from './frontend/joinGame.js';
+import NewGameCreate from './frontend/newGame.js';
+import JoinGameID from './frontend/joinGameID.js';
 
-ReactDOM.render((
-  <BrowserRouter>
-    <div>
-      <Switch>
-        <Route exact path='/' component={app}/>
-        <Route exact path='/joinGame' component={joinGame}/>
-        <Route exact path='/joinGame/:number' component={joinGameID}/>
-        <Route exact path='/newGame' component={newGameCreate}/>
-        <Route path='/joinGame/:number' component={joinGameID}/>
-      </Switch>
-    </div>
-  </BrowserRouter>
-), document.getElementById('root'))
+function App() {
+  const [username, setUsername] = useState('');
+  return (
+    <BrowserRouter>
+      <div>
+        <Switch>
+          <Route exact path='/' component={app}/>
+          <Route exact path='/joinGame' render={props => <JoinGame username={username} setUsername={setUsername} {...props}/>} />
+          <Route exact path='/joinGame/:number' render={props => <JoinGameID username={username} setUsername={setUsername} {...props}/>} />
+          <Route exact path='/newGame' render={props => <NewGameCreate username={username} setUsername={setUsername} {...props}/>} />
+        </Switch>
+      </div>
+    </BrowserRouter>
+  )
+}
+
+const rootElement = document.getElementById("root");
+ReactDOM.render(<App />, rootElement);

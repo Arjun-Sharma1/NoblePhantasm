@@ -1,15 +1,9 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import { sendLeaveLobbyRequest, sendStartGameRequest, sendRestartGameRequest, socket, checkValidLobby } from './api';
 var HashMap = require('hashmap');
-var localUser = "";
-var assassinTag = "assassin";
-var vigilanteTag = "vigilante";
-var doctorTag = "doctor";
-var detectiveTag = "detective";
-var jesterTag = "jester";
 var roles;
 
-export class joinGameID extends Component {
+export default class joinGameID extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -17,22 +11,21 @@ export class joinGameID extends Component {
       users: [],
       gameRenderState:0,
       errorMessage: '',
-      vigilante:0,
-      doctor:0,
-      jester:0,
-      detective:0,
-      assassin:1,
-      username: localUser,
+      lobbyChecked: false,
+      roles:{assassin:1, detective:0, doctor:0, jester:0, vigilante:0},
+      newRoleName: "",
       userRole: ''
     };
 
-    checkValidLobby(this.state.lobbyId.number);
+    if(!this.state.lobbyChecked){
+      checkValidLobby(this.state.lobbyId.number);
+      this.setState({lobbyChecked:true})
+    }
 
     this.startGame = this.startGame.bind(this);
     this.leaveLobby = this.leaveLobby.bind(this);
     this.addUsers = this.addUsers.bind(this);
     this.decidePage = this.decidePage.bind(this);
-    this.handleChange = this.handleChange.bind(this);
     this.decrementRoleCountHandler = this.decrementRoleCountHandler.bind(this);
     this.incrementRoleCountHandler = this.incrementRoleCountHandler.bind(this);
     this.collectRoleCount = this.collectRoleCount.bind(this);
@@ -40,14 +33,50 @@ export class joinGameID extends Component {
     this.gameRender = this.gameRender.bind(this);
     this.extractRoles = this.extractRoles.bind(this);
     this.resetGame = this.resetGame.bind(this);
-
+    this.handleNewRoleText = this.handleNewRoleText.bind(this);
+    this.addNewRole = this.addNewRole.bind(this);
   }
 
-  handleChange(event) {
-    this.setState({
-      [event.target.name]: event.target.value
-    });
+  componentDidMount() {
+    //Inital Load, check if lobby valid and set users
+    socket.on('checkLobby', function(msg) {
+      if (msg.valid === 'false') {
+        this.props.history.push('/');
+      }else{
+        this.addUsers(msg.users);
+      }
+    }.bind(this));
+
+    //Used for updating users when new person joins
+    socket.on(this.state.lobbyId.number, function(msg) {
+      if (msg.userId !== undefined && this.state.users !== msg.userId.length && !this.state.users.includes(msg.userId)) {
+        this.addUsers(msg.userId);
+      }
+    }.bind(this));
+
+    socket.on('startGameConf', function(msg) {
+      var assignedRoles = new HashMap(msg);
+      this.decidePage(assignedRoles);
+    }.bind(this));
+
+    socket.on('resetGame', function(msg) {
+      this.setState({gameRenderState:0});
+    }.bind(this));
+
+    socket.on('errorMessage', function(msg) {
+      this.setState({
+        errorMessage: msg.errorMessage
+      });
+    }.bind(this));
   }
+
+  // shouldComponentUpdate(nextProps, nextState) {
+  //   if (this.state.users === nextState.users) {
+  //     return false;
+  //   } else {
+  //     return true;
+  //   }
+  // }
 
   addUsers(username) {
     let holder = [];
@@ -57,16 +86,12 @@ export class joinGameID extends Component {
       }
       return true;
     })
-    //Check if component is fully mounted before setting state
-    while (!this.refs.joinGame) {
-      console.log("Waiting for component to mount")
-    };
     this.setState({users: holder});
   }
 
   startGame() {
     if (this.state.users.length >= 2) {
-      var checkCountFlag = this.checkRoleCount();
+      let checkCountFlag = this.checkRoleCount();
       if(checkCountFlag){
         var roleCountMap = this.collectRoleCount();
         this.setState({errorMessage: ''});
@@ -84,16 +109,14 @@ export class joinGameID extends Component {
   leaveLobby() {
     sendLeaveLobbyRequest(this.state.lobbyId.number);
     this.setState({errorMessage: ''});
-    localUser = '';
-    socket.on('leaveLobby', function(msg) {
-      this.props.history.push('/');
-    }.bind(this));
+    this.props.setUsername('');
+    this.props.history.push('/');
   }
 
   decidePage(assignedRoles) {
     roles = new HashMap(assignedRoles);
-    this.setState({userRole: roles.get(localUser)});
-    if (assignedRoles.get(localUser) === "moderator") {
+    this.setState({userRole: roles.get(this.props.username)});
+    if (assignedRoles.get(this.props.username) === "moderator") {
       this.setState({gameRenderState:1});
     } else {
       this.setState({gameRenderState:2});
@@ -102,19 +125,18 @@ export class joinGameID extends Component {
 
   collectRoleCount(){
     var countMap = new HashMap();
-    countMap.set(assassinTag, this.state.assassin);
-    countMap.set(vigilanteTag, this.state.vigilante);
-    countMap.set(doctorTag, this.state.doctor);
-    countMap.set(jesterTag, this.state.jester);
-    countMap.set(detectiveTag, this.state.detective);
+    for (const key of Object.keys(this.state.roles)){
+      countMap.set(key, this.state.roles[key])
+    }
+    console.log(countMap);
     return countMap;
   }
 
   checkRoleCount(){
     //Subtract 1 for moderator
-    var sum = this.state.assassin + this.state.vigilante + this.state.doctor + this.state.jester + this.state.detective+1;
+    var sum = Object.keys(this.state.roles).reduce((sum,key)=>sum+parseFloat(this.state.roles[key]||0),0) + 1
     if(sum <= this.state.users.length){
-      if(this.state.assassin > 0){
+      if(this.state.roles['assassin'] > 0){
         return true;
       }else{
         this.setState({errorMessage: "Must have minimum of 1 Assassin"});
@@ -125,21 +147,25 @@ export class joinGameID extends Component {
     }
   }
 
-  incrementRoleCountHandler(event, roleType, roleCount) {
+  incrementRoleCountHandler(event, roleType) {
     event.preventDefault();
-    if(roleCount+1 >= 0){
-      var newState = {};
-      newState[roleType] = roleCount+1;
-      this.setState(newState);
+    if(this.state.roles[roleType]+1 >= 0){
+      let newState = {...this.state.roles}
+      newState[roleType] += 1
+      this.setState({
+        roles:newState
+      });
     }
   }
 
-  decrementRoleCountHandler(event, roleType, roleCount) {
+  decrementRoleCountHandler(event, roleType) {
     event.preventDefault();
-    if(roleCount-1 >= 0){
-      var newState = {};
-      newState[roleType] = roleCount-1;
-      this.setState(newState);
+    if(this.state.roles[roleType]-1 >= 0){
+      let newState = {...this.state.roles}
+      newState[roleType] -= 1
+      this.setState({
+        roles:newState
+      });
     }
   }
 
@@ -149,6 +175,22 @@ export class joinGameID extends Component {
           temp.push(key + ': ' + value);
       });
       return temp;
+   }
+
+   handleNewRoleText(e){
+     this.setState({
+       newRoleName:e.target.value
+     })
+   }
+
+   addNewRole(e){
+     e.preventDefault();
+     let newRoles = {...this.state.roles}
+     newRoles[this.state.newRoleName] = 1
+     this.setState({
+       newRoleName: '',
+       roles:newRoles
+     })
    }
 
   gameRender(){
@@ -168,26 +210,19 @@ export class joinGameID extends Component {
                 <hr width="35%"></hr>
                 <h3>Role Picker</h3>
                 <form className="rolePicker" id="rolePicker" name="rolePicker">
-                  <h4>Assassin</h4>
-                  <button className='decrementBtn' onClick={ (e) => this.decrementRoleCountHandler(e,assassinTag, this.state.assassin)}>-</button>
-                  <input value={this.state.assassin} readOnly="true"/>
-                  <button className='incrementBtn' onClick={ (e) => this.incrementRoleCountHandler(e,assassinTag, this.state.assassin)}>+</button>
-                  <h4>Vigilante</h4>
-                  <button className='decrementBtn' onClick={ (e) => this.decrementRoleCountHandler(e,vigilanteTag, this.state.vigilante)}>-</button>
-                  <input value={this.state.vigilante} readOnly="true"/>
-                  <button className='incrementBtn' onClick={ (e) => this.incrementRoleCountHandler(e,vigilanteTag, this.state.vigilante)}>+</button>
-                  <h4>Doctor</h4>
-                  <button className='decrementBtn' onClick={ (e) => this.decrementRoleCountHandler(e,doctorTag, this.state.doctor)}>-</button>
-                  <input value={this.state.doctor} readOnly="true"/>
-                  <button className='incrementBtn' onClick={ (e) => this.incrementRoleCountHandler(e,doctorTag, this.state.doctor)}>+</button>
-                  <h4>Detective</h4>
-                  <button className='decrementBtn' onClick={ (e) => this.decrementRoleCountHandler(e,detectiveTag, this.state.detective)}>-</button>
-                  <input value={this.state.detective} readOnly="true"/>
-                  <button className='incrementBtn' onClick={ (e) => this.incrementRoleCountHandler(e,detectiveTag, this.state.detective)}>+</button>
-                  <h4>Jester</h4>
-                  <button className='decrementBtn' onClick={ (e) => this.decrementRoleCountHandler(e,jesterTag, this.state.jester)}>-</button>
-                  <input value={this.state.jester} readOnly="true"/>
-                  <button className='incrementBtn' onClick={ (e) => this.incrementRoleCountHandler(e,jesterTag, this.state.jester)}>+</button>
+                  {Object.keys(this.state.roles).map(x=>{
+                    return (
+                      <Fragment>
+                      <h4>{x.charAt(0).toUpperCase() + x.slice(1)}</h4>
+                          <button className='decrementBtn' onClick={ (e) => this.decrementRoleCountHandler(e,x)}>-</button>
+                          <input value={this.state.roles[x]} readOnly="true"/>
+                          <button className='incrementBtn' onClick={ (e) => this.incrementRoleCountHandler(e,x)}>+</button>
+                       </Fragment>
+                  )})
+                }
+                <h4>Add New Role:</h4>
+                <input value={this.state.newRoleName} onChange={this.handleNewRoleText} />
+                <button onClick={this.addNewRole} className='decrementBtn'>Add Role</button>
                 </form>
                 <button className='buttonPlay' onClick={this.startGame}>Start Game</button>
                 <button className='buttonLeave' onClick={this.leaveLobby}>Leave Game</button>
@@ -199,7 +234,7 @@ export class joinGameID extends Component {
           return(
             <div ref="moderator" className="App">
                 <div>
-                    <h1>{this.state.username}</h1>
+                    <h1>{this.props.username}</h1>
                     <h3>You are the {this.state.userRole}!</h3>
                     <p>Power Used || Dead</p>
                     <ul>
@@ -215,7 +250,7 @@ export class joinGameID extends Component {
           return(
             <div ref="roles" className="App">
               <div>
-                  <h1>{this.state.username}</h1>
+                  <h1>{this.props.username}</h1>
                   <h3>You have been assigned {this.state.userRole}!</h3>
               </div>
             </div>
@@ -224,34 +259,6 @@ export class joinGameID extends Component {
   }
 
   render() {
-    socket.on(this.state.lobbyId.number, function(msg) {
-      if (msg.userId !== undefined && !this.state.users.includes(msg.userId) && localUser !== '') {
-        this.addUsers(msg.userId);
-      }
-    }.bind(this));
-
-    socket.on('startGameConf', function(msg) {
-      var assignedRoles = new HashMap(msg);
-      this.decidePage(assignedRoles);
-    }.bind(this));
-
-    socket.on('resetGame', function(msg) {
-      this.setState({gameRenderState:0});
-    }.bind(this));
-
-    socket.on('errorMessage', function(msg) {
-      this.setState({
-        errorMessage: msg.errorMessage
-      });
-    }.bind(this));
-
-    socket.on('checkLobby', function(msg) {
-      if (!localUser || msg.valid === 'false') {
-        this.props.history.push('/');
-      }
-    }.bind(this));
-
-
     return (
       <div className="App">
         {this.gameRender()}
@@ -259,9 +266,3 @@ export class joinGameID extends Component {
     );
   }
 }
-
-function setLocalUser(username) {
-  localUser = username;
-};
-
-export {setLocalUser, localUser};

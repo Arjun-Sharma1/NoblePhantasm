@@ -138,12 +138,15 @@ io.on('connection', function(socket) {
 
   socket.on('checkLobby', function(lobbyId) {
     if (lobbyReg.has(lobbyId)) {
+      var clientMap = lobbyReg.get(lobbyId);
       socket.emit('checkLobby', {
-        valid: 'true'
+        valid: 'true',
+        users: clientMap.values()
       });
     } else {
       socket.emit('checkLobby', {
-        valid: 'false'
+        valid: 'false',
+        users: []
       });
     }
   });

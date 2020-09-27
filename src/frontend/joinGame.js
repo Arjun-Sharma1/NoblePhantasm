@@ -1,9 +1,8 @@
 import React, { Component } from 'react';
 import { sendJoinGameRequest, socket } from './api';
-import { setLocalUser} from './joinGameID'
+//import { setLocalUser} from './joinGameID'
 
-
-export class joinGame extends Component {
+export default class JoinGame extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -15,6 +14,22 @@ export class joinGame extends Component {
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.goToLanding = this.goToLanding.bind(this);
+  }
+
+  componentDidMount(){
+    socket.on('errorMessage', function(msg) {
+      console.log(msg);
+      this.setState({
+        errorMessage: msg.errorMessage
+      });
+    }.bind(this));
+
+    let path = this.props.history;
+    socket.on('ngConf', function(msg) {
+      if (msg.lobbyId !== '') {
+        this.setState({lobbyId: msg.lobbyId})
+      }
+    }.bind(this));
   }
 
   handleChange(event) {
@@ -33,6 +48,7 @@ export class joinGame extends Component {
         errorMessage: "Error lobby Id is empty"
       });
     } else {
+      this.props.setUsername(this.state.username);
       sendJoinGameRequest(this.state.username, this.state.lobbyId);
     }
     //Stop from refreshing the page
@@ -40,25 +56,15 @@ export class joinGame extends Component {
   }
 
   goToLanding() {
-    setLocalUser('');
+    this.props.setUsername('');
     this.props.history.push('/');
   }
 
   render() {
-      socket.on('errorMessage', function(msg) {
-        console.log(msg);
-        this.setState({
-          errorMessage: msg.errorMessage
-        });
-      }.bind(this));
-
+    if(this.props.username && this.state.lobbyId){
       let path = this.props.history;
-      socket.on('ngConf', function(msg) {
-        if (msg.lobbyId !== '') {
-          setLocalUser(this.state.username);
-          path.push('/joinGame/' + msg.lobbyId);
-        }
-      }.bind(this));
+      path.push('/joinGame/' + this.state.lobbyId);
+    }
 
     return (
       <div className="App">

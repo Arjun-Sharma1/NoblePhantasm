@@ -1,13 +1,13 @@
 import React, { Component } from 'react';
 import { sendNewGameRequest, socket } from './api';
-import {setLocalUser} from './joinGameID.js';
 
-export class newGameCreate extends Component {
+export default class NewGameCreate extends Component {
   constructor(props) {
     super(props);
     this.state = {
       username: '',
-      errorMessage: ''
+      errorMessage: '',
+      lobbyId:''
     };
 
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -27,8 +27,8 @@ export class newGameCreate extends Component {
       let path = this.props.history;
       socket.on('ngConf', function(msg) {
         if (msg.lobbyId !== '') {
-          setLocalUser(this.state.username);
-          path.push('/joinGame/' + msg.lobbyId);
+          this.props.setUsername(this.state.username);
+          this.setState({lobbyId:msg.lobbyId})
         }
       }.bind(this));
     } else {
@@ -46,6 +46,12 @@ export class newGameCreate extends Component {
   }
 
   render() {
+
+    if(this.props.username && this.state.lobbyId){
+      let path = this.props.history;
+      path.push('/joinGame/' + this.state.lobbyId);
+    }
+
     return (
       <div className="App">
         <header className="App-header">

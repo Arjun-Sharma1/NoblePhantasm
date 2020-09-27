@@ -11,11 +11,13 @@ class app extends Component {
     this.state = {
       name: '',
       gameCode: '',
-      message: ''
+      message: '',
+      localPlayer:''
     };
 
     this.goToNewGame = this.goToNewGame.bind(this);
     this.goToJoinGame = this.goToJoinGame.bind(this);
+    this.setLocalUser = this.setLocalUser.bind(this);
   }
 
   goToNewGame() {
@@ -24,6 +26,12 @@ class app extends Component {
 
   goToJoinGame() {
     this.props.history.push('/joinGame');
+  }
+
+  setLocalUser(username) {
+    this.setState({
+      localPlayer: username
+    })
   }
 
   render() {
